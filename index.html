@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="description" content="What if a coin toss decided every IPL match? Find out your team's playoff chances.">
+  <meta property="og:title" content="TossIPL - Coin Toss Playoff Simulator">
+  <meta property="og:description" content="What if a coin toss decided every IPL match? Check your team's chances!">
+  <meta property="og:type" content="website">
+  <title>TossIPL - What if a coin toss decided the IPL?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <a href="?" class="logo" style="text-decoration:none">Toss<span>IPL</span></a>
+    <div class="header-controls">
+      <select class="lang-select" id="lang-select" aria-label="Language"></select>
+    </div>
+  </header>
+
+  <!-- PAGE: Team Selector -->
+  <main id="page-home" class="page active">
+    <div class="coin-container">
+      <div class="coin" id="coin" title="Flip!">&#x1FA99;</div>
+    </div>
+    <h1 class="page-title" data-i18n="appTitle">TossIPL</h1>
+    <p class="page-subtitle" data-i18n="tagline">What if a coin toss decided the IPL?</p>
+    <h2 class="page-title" style="font-size:1.1rem; margin-bottom:20px" data-i18n="selectTeam">Select Your Team</h2>
+    <div class="team-grid" id="team-grid">
+      <!-- Populated by JS -->
+    </div>
+  </main>
+
+  <!-- PAGE: Analysis -->
+  <main id="page-analysis" class="page">
+    <button class="back-btn" id="back-btn">
+      <span>&#8592;</span> <span data-i18n="selectTeam">Select Your Team</span>
+    </button>
+
+    <!-- Computing overlay -->
+    <div id="computing" class="computing-overlay">
+      <div class="spinner"></div>
+      <div class="computing-text" data-i18n="computing">Computing scenarios...</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- Results (hidden until computation done) -->
+    <div id="results" class="hidden">
+
+      <!-- Capture area for screenshot -->
+      <div id="capture-area">
+        <!-- Hero -->
+        <div class="hero" id="hero">
+          <div class="hero-team-name" id="hero-team-name"></div>
+          <div class="hero-percent" id="hero-percent">--</div>
+          <div class="hero-label" data-i18n="qualifyChance">chance of qualifying</div>
+          <div class="hero-detail">
+            <strong id="hero-qualify-count">--</strong>
+            <span data-i18n="outOf">out of</span>
+            <strong id="hero-total-count">--</strong>
+            <span data-i18n="scenarios">scenarios</span>
+            <span data-i18n="leadToPlayoffs">lead to playoffs</span>
+          </div>
+          <div class="hero-badge" id="hero-badge"></div>
+        </div>
+
+        <!-- Status row -->
+        <div class="status-row">
+          <div class="status-item">
+            <div class="status-value" id="remaining-count">--</div>
+            <div class="status-label" data-i18n="remainingMatches">Remaining Matches</div>
+          </div>
+        </div>
+
+        <div class="watermark">cointossipl.com</div>
+      </div>
+      <!-- End capture area -->
+
+      <!-- Share buttons -->
+      <div id="share-section">
+        <div class="share-buttons">
+          <button class="share-btn whatsapp" id="share-whatsapp">
+            <span>WhatsApp</span>
+          </button>
+          <button class="share-btn twitter" id="share-twitter">
+            <span>X / Twitter</span>
+          </button>
+          <button class="share-btn" id="share-copy">
+            <span data-i18n="copyLink">Copy Link</span>
+          </button>
+          <button class="share-btn" id="share-native" style="display:none">
+            <span data-i18n="share">Share</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Specific Paths (shown when few qualifying scenarios) -->
+      <div id="specific-paths" class="specific-paths hidden">
+        <h3 data-i18n="specificPaths">Specific paths to playoffs</h3>
+        <div id="paths-container"></div>
+      </div>
+
+      <!-- How it works -->
+      <div class="info-section">
+        <button class="info-toggle" id="info-toggle">
+          <span data-i18n="howItWorks">How it works</span>
+          <span class="arrow">&#9660;</span>
+        </button>
+        <div class="info-content" id="info-content">
+          <p data-i18n="howItWorksDesc">We simulate every possible outcome of the remaining IPL matches. Each match is a coin toss - 50/50. We then count how many of those outcomes result in your team finishing in the top 4.</p>
+          <p class="disclaimer" data-i18n="nrrDisclaimer" style="margin-top:10px">Ties broken alphabetically (NRR not simulated)</p>
+        </div>
+      </div>
+
+      <!-- Outcome Explorer -->
+      <div class="explorer" id="explorer-section">
+        <h3 data-i18n="browseScenarios">Browse Scenarios</h3>
+        <div class="explorer-controls">
+          <input type="number" class="explorer-input" id="explorer-input" min="1" value="1" placeholder="Scenario #">
+          <span class="explorer-total" id="explorer-total"></span>
+        </div>
+        <input type="range" class="explorer-slider" id="explorer-slider" min="1" value="1">
+      </div>
+
+      <!-- Standings Table -->
+      <div id="standings-section">
+        <h3 data-i18n="standings" style="margin-bottom:12px">Standings</h3>
+        <table class="standings-table" id="standings-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th data-i18n="team">Team</th>
+              <th data-i18n="played">P</th>
+              <th data-i18n="won">W</th>
+              <th data-i18n="lost">L</th>
+              <th data-i18n="points">Pts</th>
+            </tr>
+          </thead>
+          <tbody id="standings-body">
+          </tbody>
+        </table>
+        <p class="disclaimer" data-i18n="nrrDisclaimer">Ties broken alphabetically (NRR not simulated)</p>
+      </div>
+
+    </div><!-- end #results -->
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/share.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
