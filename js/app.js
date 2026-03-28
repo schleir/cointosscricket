@@ -20,8 +20,10 @@
     var resp = await fetch('data/ipl2025.json');
     appData = await resp.json();
 
-    // Detect test mode
-    isTestMode = window.location.pathname.indexOf('test.html') !== -1;
+    // Detect test mode from URL param or filename
+    var params = new URLSearchParams(window.location.search);
+    isTestMode = params.has('mode') && params.get('mode') === 'test' ||
+      window.location.pathname.indexOf('test.html') !== -1;
 
     if (window.I18n) {
       I18n.init();
@@ -37,8 +39,7 @@
     renderTeamGrid();
     setupEventListeners();
 
-    // Check URL params
-    var params = new URLSearchParams(window.location.search);
+    // Check URL params (reuse params from above)
     var teamParam = params.get('team');
 
     if (isTestMode) {
@@ -59,8 +60,33 @@
 
   // ===== TEST CONTROLS =====
   function setupTestControls() {
+    // Create test controls dynamically if they don't exist in the DOM
     var controls = document.getElementById('test-controls');
-    if (!controls) return;
+    if (!controls) {
+      var wrapper = document.createElement('div');
+      wrapper.style.cssText = 'max-width:680px;margin:0 auto;padding:12px 20px 0';
+      wrapper.innerHTML =
+        '<div class="test-controls" id="test-controls">' +
+        '<label>Matches completed (N): <span class="test-n-value" id="test-n-value">0 / 0</span></label>' +
+        '<input type="range" id="test-n-slider" min="0" value="0">' +
+        '</div>';
+      var header = document.querySelector('.header');
+      header.parentNode.insertBefore(wrapper, header.nextSibling);
+      controls = document.getElementById('test-controls');
+
+      // Update header to show TEST badge
+      var logo = document.querySelector('.logo');
+      if (logo && logo.innerHTML.indexOf('TEST') === -1) {
+        logo.innerHTML += ' <span style="font-size:0.7rem;color:var(--warning);font-weight:400">TEST</span>';
+      }
+
+      // Update subtitle
+      var subtitle = document.querySelector('.page-subtitle');
+      if (subtitle) {
+        subtitle.style.color = 'var(--warning)';
+        subtitle.textContent = 'Test Mode — Use slider above to simulate being at any point in the IPL season';
+      }
+    }
     controls.classList.remove('hidden');
 
     var slider = document.getElementById('test-n-slider');
