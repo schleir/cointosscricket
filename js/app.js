@@ -755,69 +755,84 @@
     };
 
     // Share buttons
-    document.getElementById('share-whatsapp').onclick = function () {
+    // Shared helper: capture image + generate text, then call callback
+    function shareWithImage(callback) {
       if (!computeResult || !window.Share) return;
       var text = Share.generateShareText(
         selectedTeam.shortName, computeResult.qualifyPercent,
         computeResult.qualifyClean, computeResult.qualifyNRRDependent,
         computeResult.totalScenarios, computeResult.detailedScenarios, appData.teams
       );
-      // Try native share with image first (works on mobile, user picks WhatsApp)
       Share.captureAsImage('#capture-area').then(function (blob) {
-        if (blob && Share.canShareNatively()) {
-          var file = new File([blob], 'tossipl.png', { type: 'image/png' });
-          var shareData = { text: text + '\n\n' + window.location.href, files: [file] };
-          if (navigator.canShare && navigator.canShare(shareData)) {
-            navigator.share(shareData).catch(function () {
-              // User cancelled or error — fall back to text-only
-              Share.shareWhatsApp(text, window.location.href);
-            });
-            return;
-          }
-        }
-        // Fallback: text-only wa.me link
-        Share.shareWhatsApp(text, window.location.href);
+        callback(text, blob);
       }).catch(function () {
-        Share.shareWhatsApp(text, window.location.href);
+        callback(text, null);
+      });
+    }
+
+    function tryNativeShareWithImage(text, blob, fallback) {
+      if (blob && Share.canShareNatively()) {
+        var file = new File([blob], 'tossipl.png', { type: 'image/png' });
+        var shareData = { text: text + '\n\n' + window.location.href, files: [file] };
+        if (navigator.canShare && navigator.canShare(shareData)) {
+          navigator.share(shareData).catch(function () { fallback(text); });
+          return;
+        }
+      }
+      fallback(text);
+    }
+
+    document.getElementById('share-whatsapp').onclick = function () {
+      shareWithImage(function (text, blob) {
+        tryNativeShareWithImage(text, blob, function () {
+          Share.shareWhatsApp(text, window.location.href);
+        });
       });
     };
 
     document.getElementById('share-twitter').onclick = function () {
-      if (!computeResult || !window.Share) return;
-      var text = Share.generateShareText(
-        selectedTeam.shortName, computeResult.qualifyPercent,
-        computeResult.qualifyClean, computeResult.qualifyNRRDependent,
-        computeResult.totalScenarios, computeResult.detailedScenarios, appData.teams
-      );
-      Share.shareTwitter(text, window.location.href);
+      shareWithImage(function (text, blob) {
+        tryNativeShareWithImage(text, blob, function () {
+          Share.shareTwitter(text, window.location.href);
+        });
+      });
     };
 
     document.getElementById('share-copy').onclick = function () {
       if (!window.Share) return;
       var btn = this;
-      Share.copyLink(window.location.href).then(function (ok) {
-        if (ok) {
-          var span = btn.querySelector('span') || btn;
-          var orig = span.textContent;
-          span.textContent = t('copied');
-          setTimeout(function () { span.textContent = orig; }, 2000);
+      shareWithImage(function (text, blob) {
+        // Try copying image to clipboard if supported
+        if (blob && navigator.clipboard && navigator.clipboard.write) {
+          var item = new ClipboardItem({ 'image/png': blob });
+          navigator.clipboard.write([item]).then(function () {
+            showCopiedFeedback(btn, 'Image copied!');
+          }).catch(function () {
+            // Fall back to copying link
+            Share.copyLink(window.location.href).then(function (ok) {
+              if (ok) showCopiedFeedback(btn, t('copied'));
+            });
+          });
+        } else {
+          Share.copyLink(window.location.href).then(function (ok) {
+            if (ok) showCopiedFeedback(btn, t('copied'));
+          });
         }
       });
     };
 
+    function showCopiedFeedback(btn, msg) {
+      var span = btn.querySelector('span') || btn;
+      var orig = span.textContent;
+      span.textContent = msg;
+      setTimeout(function () { span.textContent = orig; }, 2000);
+    }
+
     var nativeBtn = document.getElementById('share-native');
     if (nativeBtn) {
       nativeBtn.onclick = function () {
-        if (!computeResult || !window.Share) return;
-        var text = Share.generateShareText(
-          selectedTeam.shortName, computeResult.qualifyPercent,
-          computeResult.qualifyClean, computeResult.qualifyNRRDependent,
-          computeResult.totalScenarios, computeResult.detailedScenarios, appData.teams
-        );
-        Share.captureAsImage('#capture-area').then(function (blob) {
+        shareWithImage(function (text, blob) {
           Share.shareNative('TossIPL', text, window.location.href, blob);
-        }).catch(function () {
-          Share.shareNative('TossIPL', text, window.location.href, null);
         });
       };
     }
