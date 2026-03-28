@@ -2,43 +2,49 @@
   'use strict';
 
   // ===== STATE =====
-  let appData = null;       // { season, teams, matches }
-  let selectedTeam = null;  // team object
-  let computeResult = null; // result from simulator
-  let worker = null;
+  var appData = null;
+  var selectedTeam = null;
+  var computeResult = null;
+  var worker = null;
+  var isTestMode = false;
+  var testN = null;
 
-  // Team lookup helper
   function teamById(id) {
+    if (!appData) return null;
     return appData.teams.find(function (t) { return t.id === id; });
   }
 
   // ===== INIT =====
   async function init() {
-    // Load data
-    const resp = await fetch('data/ipl2025.json');
+    var resp = await fetch('data/ipl2025.json');
     appData = await resp.json();
 
-    // Init i18n
+    // Detect test mode
+    isTestMode = window.location.pathname.indexOf('test.html') !== -1;
+
     if (window.I18n) {
       I18n.init();
       populateLanguageSelector();
       applyTranslations();
     }
 
-    // Setup share native button visibility
     if (window.Share && Share.canShareNatively()) {
-      document.getElementById('share-native').style.display = '';
+      var nativeBtn = document.getElementById('share-native');
+      if (nativeBtn) nativeBtn.style.display = '';
     }
 
-    // Build team grid
     renderTeamGrid();
-
-    // Setup event listeners
     setupEventListeners();
 
-    // Check URL for team param
+    // Check URL params
     var params = new URLSearchParams(window.location.search);
     var teamParam = params.get('team');
+
+    if (isTestMode) {
+      testN = parseInt(params.get('n')) || appData.matches.length;
+      setupTestControls();
+    }
+
     if (teamParam) {
       var team = teamById(teamParam);
       if (team) {
@@ -50,6 +56,40 @@
     showPage('home');
   }
 
+  // ===== TEST CONTROLS =====
+  function setupTestControls() {
+    var controls = document.getElementById('test-controls');
+    if (!controls) return;
+    controls.classList.remove('hidden');
+
+    var slider = document.getElementById('test-n-slider');
+    var display = document.getElementById('test-n-value');
+    var total = appData.matches.length;
+
+    slider.max = total;
+    slider.value = testN;
+    display.textContent = testN + ' / ' + total;
+
+    slider.oninput = function () {
+      testN = parseInt(this.value);
+      display.textContent = testN + ' / ' + total;
+    };
+
+    slider.onchange = function () {
+      testN = parseInt(this.value);
+      display.textContent = testN + ' / ' + total;
+      // Update URL
+      var url = new URL(window.location);
+      url.searchParams.set('n', testN);
+      window.history.replaceState({}, '', url);
+      // Re-run computation if team selected
+      if (selectedTeam) {
+        showComputing();
+        startComputation(selectedTeam);
+      }
+    };
+  }
+
   // ===== TEAM GRID =====
   function renderTeamGrid() {
     var grid = document.getElementById('team-grid');
@@ -57,7 +97,7 @@
     appData.teams.forEach(function (team) {
       var card = document.createElement('a');
       card.className = 'team-card';
-      card.href = '?team=' + team.id;
+      card.href = '?team=' + team.id + (isTestMode && testN ? '&n=' + testN : '');
       card.onclick = function (e) {
         e.preventDefault();
         selectTeam(team);
@@ -79,14 +119,12 @@
     selectedTeam = team;
     computeResult = null;
 
-    // Update URL without reload
     var url = new URL(window.location);
     url.searchParams.set('team', team.id);
+    if (isTestMode && testN) url.searchParams.set('n', testN);
     window.history.pushState({}, '', url);
 
-    // Update page title
     document.title = team.shortName + ' - TossIPL';
-
     showPage('analysis');
     showComputing();
     startComputation(team);
@@ -104,12 +142,34 @@
     document.getElementById('results').classList.remove('hidden');
   }
 
+  function getEffectiveMatches() {
+    if (!isTestMode || testN == null) return appData.matches;
+
+    // In test mode, treat first N matches as completed (use actual data),
+    // remaining as not yet played
+    return appData.matches.map(function (m, idx) {
+      if (idx < testN) {
+        return m; // keep as-is (completed with actual result)
+      } else {
+        return {
+          num: m.num,
+          home: m.home,
+          away: m.away,
+          result: null,
+          winner: null,
+          completed: false
+        };
+      }
+    });
+  }
+
   function startComputation(team) {
-    // Check cache
-    var completed = appData.matches.filter(function (m) { return m.completed; }).length;
-    var cacheKey = 'tossIPL_v1_' + team.id + '_md' + completed;
+    var matches = getEffectiveMatches();
+    var completed = matches.filter(function (m) { return m.completed; }).length;
+    var cacheKey = 'tossIPL_v2_' + team.id + '_md' + completed;
+
     var cached = null;
-    try { cached = JSON.parse(localStorage.getItem(cacheKey)); } catch (e) { /* ignore */ }
+    try { cached = JSON.parse(localStorage.getItem(cacheKey)); } catch (e) {}
 
     if (cached) {
       computeResult = cached;
@@ -117,10 +177,7 @@
       return;
     }
 
-    // Terminate previous worker
-    if (worker) {
-      worker.terminate();
-    }
+    if (worker) worker.terminate();
 
     worker = new Worker('js/simulator.js');
 
@@ -130,8 +187,7 @@
         document.getElementById('progress-fill').style.width = msg.percent + '%';
       } else if (msg.type === 'result') {
         computeResult = msg;
-        // Cache result
-        try { localStorage.setItem(cacheKey, JSON.stringify(msg)); } catch (e) { /* quota */ }
+        try { localStorage.setItem(cacheKey, JSON.stringify(msg)); } catch (e) {}
         renderResults();
       }
     };
@@ -139,7 +195,7 @@
     worker.postMessage({
       type: 'compute',
       teams: appData.teams,
-      matches: appData.matches,
+      matches: matches,
       targetTeamId: team.id,
       topN: 4
     });
@@ -150,99 +206,160 @@
     var r = computeResult;
     showResults();
 
-    // Hero
-    var heroEl = document.getElementById('hero');
-    heroEl.style.setProperty('--team-color', selectedTeam.color);
+    // Result banner
+    var banner = document.getElementById('result-banner');
+    banner.style.setProperty('--team-color', selectedTeam.color);
     document.getElementById('hero-team-name').textContent = selectedTeam.name;
     document.getElementById('hero-percent').textContent = r.qualifyPercent.toFixed(1) + '%';
-    document.getElementById('hero-qualify-count').textContent = formatNumber(r.qualifyCount);
-    document.getElementById('hero-total-count').textContent = formatNumber(r.totalScenarios);
-    document.getElementById('remaining-count').textContent = r.remainingMatches;
+
+    // Detail text
+    var effectiveQualify = r.qualifyClean + Math.round(0.5 * r.qualifyNRRDependent);
+    var detailEl = document.getElementById('hero-detail');
+    detailEl.innerHTML =
+      '<strong>' + formatNumber(effectiveQualify) + '</strong> ' +
+      t('outOf') + ' <strong>' + formatNumber(r.totalScenarios) + '</strong> ' +
+      t('scenarios') + ' ' + t('leadToPlayoffs');
 
     // Badge
     var badge = document.getElementById('hero-badge');
     if (r.isExact) {
       badge.className = 'hero-badge exact';
-      badge.setAttribute('data-i18n', 'exactCalculation');
-      badge.textContent = I18n ? I18n.t('exactCalculation') : 'Exact calculation';
+      badge.textContent = t('exactCalculation');
     } else {
       badge.className = 'hero-badge approx';
-      badge.setAttribute('data-i18n', 'approximateCalculation');
-      badge.textContent = I18n ? I18n.t('approximateCalculation') : 'Approximate (Monte Carlo simulation)';
+      badge.textContent = t('approximateCalculation');
     }
 
-    // Specific paths (when few qualifying scenarios)
-    var pathsSection = document.getElementById('specific-paths');
-    var pathsContainer = document.getElementById('paths-container');
-    if (r.detailedScenarios && r.detailedScenarios.length > 0 && r.detailedScenarios.length <= 10) {
-      pathsSection.classList.remove('hidden');
-      pathsContainer.innerHTML = '';
-      r.detailedScenarios.forEach(function (scenario, idx) {
-        var card = document.createElement('div');
-        card.className = 'path-card';
+    // Remaining matches
+    document.getElementById('remaining-count').textContent = r.remainingMatches;
 
-        var numLabel = (I18n ? I18n.t('scenarioNumber') : 'Scenario') + ' ' + (idx + 1);
-        var outcomesHtml = scenario.outcomes.map(function (o) {
-          var homeTeam = teamById(o.home);
-          var awayTeam = teamById(o.away);
-          var winnerTeam = teamById(o.winner);
-          var loserTeam = o.winner === o.home ? awayTeam : homeTeam;
-          return '<span class="path-outcome"><span class="winner">' + winnerTeam.shortName +
-            '</span> beat <span class="loser">' + loserTeam.shortName + '</span></span>';
-        }).join('');
+    // Breakdown bar
+    var total = r.totalScenarios;
+    var cleanPct = total > 0 ? (r.qualifyClean / total) * 100 : 0;
+    var nrrPct = total > 0 ? (r.qualifyNRRDependent / total) * 100 : 0;
+    var elimPct = total > 0 ? (r.eliminated / total) * 100 : 0;
 
-        card.innerHTML = '<div class="path-number">' + numLabel + '</div>' +
-          '<div class="path-outcomes">' + outcomesHtml + '</div>';
-        pathsContainer.appendChild(card);
-      });
-    } else {
-      pathsSection.classList.add('hidden');
-    }
+    document.getElementById('seg-clean').style.width = cleanPct + '%';
+    document.getElementById('seg-nrr').style.width = nrrPct + '%';
+    document.getElementById('seg-elim').style.width = elimPct + '%';
+    document.getElementById('pct-clean').textContent = cleanPct.toFixed(1) + '%';
+    document.getElementById('pct-nrr').textContent = nrrPct.toFixed(1) + '%';
+    document.getElementById('pct-elim').textContent = elimPct.toFixed(1) + '%';
 
-    // Explorer
-    var remaining = appData.matches.filter(function (m) { return !m.completed; });
+    // Specific paths
+    renderSpecificPaths(r.detailedScenarios);
+
+    // Explorer setup
+    var matches = getEffectiveMatches();
+    var remaining = matches.filter(function (m) { return !m.completed; });
     var totalScenarios = r.isExact ? r.totalScenarios : Math.pow(2, remaining.length);
-    var maxScenario = Math.min(totalScenarios, 1000000); // cap for UI
+    var maxScenario = Math.min(totalScenarios, 1000000);
 
     var slider = document.getElementById('explorer-slider');
     var input = document.getElementById('explorer-input');
     slider.max = maxScenario;
     input.max = maxScenario;
     document.getElementById('explorer-total').textContent =
-      (I18n ? I18n.t('outOf') : 'out of') + ' ' + formatNumber(totalScenarios);
+      t('outOf') + ' ' + formatNumber(totalScenarios);
 
-    // Render scenario #1
     renderScenario(0);
+  }
 
-    // Current standings (no scenario applied)
-    renderCurrentStandings();
+  // ===== SPECIFIC PATHS =====
+  function renderSpecificPaths(scenarios) {
+    var section = document.getElementById('specific-paths');
+    var container = document.getElementById('paths-container');
+
+    if (!scenarios || scenarios.length === 0 || scenarios.length > 10) {
+      section.classList.add('hidden');
+      return;
+    }
+
+    section.classList.remove('hidden');
+    container.innerHTML = '';
+
+    scenarios.forEach(function (scenario, idx) {
+      var card = document.createElement('div');
+      card.className = 'path-card';
+
+      var label = t('scenarioNumber') + ' ' + (idx + 1);
+      if (scenario.category === 'nrr_dependent') {
+        label += ' (NRR)';
+      }
+
+      var outcomesHtml = scenario.outcomes.map(function (o) {
+        var winner = teamById(o.winner);
+        var loserId = o.winner === o.home ? o.away : o.home;
+        var loser = teamById(loserId);
+        return '<span class="path-outcome"><span class="winner">' +
+          (winner ? winner.shortName : o.winner) +
+          '</span> beat <span class="loser">' +
+          (loser ? loser.shortName : loserId) + '</span></span>';
+      }).join('');
+
+      var nrrHtml = '';
+      if (scenario.nrrInfo) {
+        var info = scenario.nrrInfo;
+        nrrHtml = '<div class="nrr-guidance" style="margin-top:8px">' +
+          '<p>Need NRR +' + info.nrrDelta.toFixed(3) + ' over ' + info.rivalName + '</p>' +
+          '<p>Batting first: win by ~<strong>' + info.runsPerMatch + ' runs/match</strong></p>' +
+          '<p>Batting second: chase with ~<strong>' + info.oversPerMatch + ' overs to spare/match</strong></p>' +
+          '</div>';
+      }
+
+      card.innerHTML = '<div class="path-number">' + label + '</div>' +
+        '<div class="path-outcomes">' + outcomesHtml + '</div>' + nrrHtml;
+      container.appendChild(card);
+    });
   }
 
   // ===== SCENARIO EXPLORER =====
   function renderScenario(index) {
-    var remaining = appData.matches.filter(function (m) { return !m.completed; });
-    var completed = appData.matches.filter(function (m) { return m.completed; });
+    var matches = getEffectiveMatches();
+    var remaining = matches.filter(function (m) { return !m.completed; });
+    var completed = matches.filter(function (m) { return m.completed; });
 
-    // Build points from completed matches
     var points = {};
     var wins = {};
     var losses = {};
+    var noResults = {};
+    var nrrData = {};
+
     appData.teams.forEach(function (t) {
       points[t.id] = 0;
       wins[t.id] = 0;
       losses[t.id] = 0;
+      noResults[t.id] = 0;
+      nrrData[t.id] = { runsScored: 0, oversPlayed: 0, runsConceded: 0, oversBowled: 0 };
     });
 
+    // Apply completed matches
     completed.forEach(function (m) {
-      if (m.winner) {
+      if (m.result === 'no_result') {
+        points[m.home] += 1;
+        points[m.away] += 1;
+        noResults[m.home]++;
+        noResults[m.away]++;
+      } else if (m.result === 'tie') {
+        points[m.home] += 1;
+        points[m.away] += 1;
+        noResults[m.home]++;
+        noResults[m.away]++;
+        if (m.homeRuns != null) {
+          addNRR(nrrData, m.home, m.away, m.homeRuns, m.homeOvers, m.awayRuns, m.awayOvers);
+        }
+      } else if (m.result === 'win' && m.winner) {
         points[m.winner] += 2;
         wins[m.winner]++;
         var loser = m.winner === m.home ? m.away : m.home;
         losses[loser]++;
+        if (m.homeRuns != null) {
+          addNRR(nrrData, m.home, m.away, m.homeRuns, m.homeOvers, m.awayRuns, m.awayOvers);
+        }
       }
     });
 
-    // Apply scenario outcomes based on index (binary encoding)
+    // Apply scenario outcomes
     remaining.forEach(function (m, j) {
       var bit = (index >> j) & 1;
       var winner = bit ? m.home : m.away;
@@ -254,29 +371,108 @@
 
     // Build standings
     var standings = appData.teams.map(function (t) {
+      var d = nrrData[t.id];
+      var nrr = 0;
+      if (d.oversPlayed > 0 && d.oversBowled > 0) {
+        nrr = (d.runsScored / d.oversPlayed) - (d.runsConceded / d.oversBowled);
+      }
       return {
         teamId: t.id,
         shortName: t.shortName,
         name: t.name,
         color: t.color,
-        played: wins[t.id] + losses[t.id],
+        played: wins[t.id] + losses[t.id] + noResults[t.id],
         won: wins[t.id],
         lost: losses[t.id],
-        points: points[t.id]
+        points: points[t.id],
+        nrr: Math.round(nrr * 1000) / 1000
       };
     });
 
     standings.sort(function (a, b) {
       if (b.points !== a.points) return b.points - a.points;
+      if (b.nrr !== a.nrr) return b.nrr - a.nrr;
       return a.name.localeCompare(b.name);
     });
 
     renderStandingsTable(standings);
+
+    // Check if this scenario is NRR-dependent for the target team
+    renderNRRGuidance(standings, points, remaining);
   }
 
-  function renderCurrentStandings() {
-    // This is called initially - shows current standings before any scenario
-    renderScenario(0);
+  function addNRR(nrrData, homeId, awayId, homeRuns, homeOvers, awayRuns, awayOvers) {
+    var hOv = oversToDecimal(homeOvers);
+    var aOv = oversToDecimal(awayOvers);
+    nrrData[homeId].runsScored += homeRuns;
+    nrrData[homeId].oversPlayed += hOv;
+    nrrData[homeId].runsConceded += awayRuns;
+    nrrData[homeId].oversBowled += aOv;
+    nrrData[awayId].runsScored += awayRuns;
+    nrrData[awayId].oversPlayed += aOv;
+    nrrData[awayId].runsConceded += homeRuns;
+    nrrData[awayId].oversBowled += hOv;
+  }
+
+  function oversToDecimal(overs) {
+    var full = Math.floor(overs);
+    var balls = Math.round((overs - full) * 10);
+    return full + balls / 6;
+  }
+
+  function renderNRRGuidance(standings, points, remaining) {
+    var guidance = document.getElementById('nrr-guidance');
+    var content = document.getElementById('nrr-guidance-content');
+
+    if (!selectedTeam) { guidance.classList.add('hidden'); return; }
+
+    var targetPts = points[selectedTeam.id];
+    var targetRank = -1;
+    for (var i = 0; i < standings.length; i++) {
+      if (standings[i].teamId === selectedTeam.id) {
+        targetRank = i + 1;
+        break;
+      }
+    }
+
+    // Check if team is at the qualify boundary (4th/5th) and tied on points
+    if (targetRank <= 4) {
+      // Check if 5th place has same points
+      if (standings.length > 4 && standings[3].points === standings[4].points) {
+        // There's a tie at the boundary
+        var tiedTeams = standings.filter(function (s) {
+          return s.points === standings[3].points;
+        });
+        if (tiedTeams.length > 1 && tiedTeams.some(function (s) { return s.teamId === selectedTeam.id; })) {
+          guidance.classList.remove('hidden');
+          var rivals = tiedTeams.filter(function (s) { return s.teamId !== selectedTeam.id; })
+            .map(function (s) { return s.shortName; }).join(', ');
+
+          // Calculate remaining matches for target team
+          var targetRemaining = remaining.filter(function (m) {
+            return m.home === selectedTeam.id || m.away === selectedTeam.id;
+          }).length;
+
+          content.innerHTML =
+            '<p>Tied on <strong>' + targetPts + ' points</strong> with ' + rivals + '</p>' +
+            '<p>NRR decides qualification. Across ' + targetRemaining + ' remaining match(es):</p>' +
+            '<p>Batting first: win by bigger margins to boost NRR</p>' +
+            '<p>Batting second: chase targets with overs to spare</p>';
+          return;
+        }
+      }
+    } else {
+      // Team is 5th or below - check if tied with 4th
+      if (standings.length > 3 && targetPts === standings[3].points) {
+        guidance.classList.remove('hidden');
+        content.innerHTML =
+          '<p>Tied on <strong>' + targetPts + ' points</strong> with teams in qualifying positions</p>' +
+          '<p>Need to improve NRR to overtake them</p>';
+        return;
+      }
+    }
+
+    guidance.classList.add('hidden');
   }
 
   function renderStandingsTable(standings) {
@@ -292,6 +488,8 @@
       if (isTarget) tr.classList.add('highlight');
       if (isQualifyZone) tr.classList.add('qualify-zone');
 
+      var nrrStr = s.nrr >= 0 ? '+' + s.nrr.toFixed(3) : s.nrr.toFixed(3);
+
       tr.innerHTML =
         '<td class="rank">' + rank + '</td>' +
         '<td><div class="team-cell">' +
@@ -301,7 +499,8 @@
         '<td>' + s.played + '</td>' +
         '<td>' + s.won + '</td>' +
         '<td>' + s.lost + '</td>' +
-        '<td class="pts">' + s.points + '</td>';
+        '<td class="pts">' + s.points + '</td>' +
+        '<td>' + nrrStr + '</td>';
 
       tbody.appendChild(tr);
     });
@@ -309,17 +508,17 @@
 
   // ===== EVENT LISTENERS =====
   function setupEventListeners() {
-    // Back button
     document.getElementById('back-btn').onclick = function () {
       if (worker) worker.terminate();
       selectedTeam = null;
       computeResult = null;
-      window.history.pushState({}, '', '?');
+      var url = new URL(window.location);
+      url.searchParams.delete('team');
+      window.history.pushState({}, '', url.toString());
       document.title = 'TossIPL - What if a coin toss decided the IPL?';
       showPage('home');
     };
 
-    // Browser back/forward
     window.addEventListener('popstate', function () {
       var params = new URLSearchParams(window.location.search);
       var teamParam = params.get('team');
@@ -330,12 +529,14 @@
       showPage('home');
     });
 
-    // Coin flip animation
+    // Coin flip
     var coin = document.getElementById('coin');
-    coin.onclick = function () {
-      coin.classList.add('flipping');
-      setTimeout(function () { coin.classList.remove('flipping'); }, 600);
-    };
+    if (coin) {
+      coin.onclick = function () {
+        coin.classList.add('flipping');
+        setTimeout(function () { coin.classList.remove('flipping'); }, 600);
+      };
+    }
 
     // Info toggle
     document.getElementById('info-toggle').onclick = function () {
@@ -343,14 +544,13 @@
       document.getElementById('info-content').classList.toggle('open');
     };
 
-    // Explorer slider
+    // Explorer
     document.getElementById('explorer-slider').oninput = function () {
       var val = parseInt(this.value);
       document.getElementById('explorer-input').value = val;
       renderScenario(val - 1);
     };
 
-    // Explorer input
     document.getElementById('explorer-input').onchange = function () {
       var val = parseInt(this.value) || 1;
       var max = parseInt(this.max) || 1;
@@ -360,15 +560,12 @@
       renderScenario(val - 1);
     };
 
-    // Language selector
+    // Language
     document.getElementById('lang-select').onchange = function () {
       if (window.I18n) {
         I18n.setLanguage(this.value);
         applyTranslations();
-        // Re-render badge text if results are showing
-        if (computeResult) {
-          renderResults();
-        }
+        if (computeResult) renderResults();
       }
     };
 
@@ -377,8 +574,8 @@
       if (!computeResult || !window.Share) return;
       var text = Share.generateShareText(
         selectedTeam.shortName, computeResult.qualifyPercent,
-        computeResult.qualifyCount, computeResult.totalScenarios,
-        computeResult.detailedScenarios, appData.teams
+        computeResult.qualifyClean, computeResult.qualifyNRRDependent,
+        computeResult.totalScenarios, computeResult.detailedScenarios, appData.teams
       );
       Share.shareWhatsApp(text, window.location.href);
     };
@@ -387,8 +584,8 @@
       if (!computeResult || !window.Share) return;
       var text = Share.generateShareText(
         selectedTeam.shortName, computeResult.qualifyPercent,
-        computeResult.qualifyCount, computeResult.totalScenarios,
-        computeResult.detailedScenarios, appData.teams
+        computeResult.qualifyClean, computeResult.qualifyNRRDependent,
+        computeResult.totalScenarios, computeResult.detailedScenarios, appData.teams
       );
       Share.shareTwitter(text, window.location.href);
     };
@@ -398,33 +595,38 @@
       var btn = this;
       Share.copyLink(window.location.href).then(function (ok) {
         if (ok) {
-          var orig = btn.querySelector('span').textContent;
-          btn.querySelector('span').textContent = I18n ? I18n.t('copied') : 'Copied!';
-          setTimeout(function () {
-            btn.querySelector('span').textContent = orig;
-          }, 2000);
+          var span = btn.querySelector('span') || btn;
+          var orig = span.textContent;
+          span.textContent = t('copied');
+          setTimeout(function () { span.textContent = orig; }, 2000);
         }
       });
     };
 
-    document.getElementById('share-native').onclick = function () {
-      if (!computeResult || !window.Share) return;
-      var text = Share.generateShareText(
-        selectedTeam.shortName, computeResult.qualifyPercent,
-        computeResult.qualifyCount, computeResult.totalScenarios,
-        computeResult.detailedScenarios, appData.teams
-      );
-
-      // Try to capture image first
-      Share.captureAsImage('#capture-area').then(function (blob) {
-        Share.shareNative('TossIPL', text, window.location.href, blob);
-      }).catch(function () {
-        Share.shareNative('TossIPL', text, window.location.href, null);
-      });
-    };
+    var nativeBtn = document.getElementById('share-native');
+    if (nativeBtn) {
+      nativeBtn.onclick = function () {
+        if (!computeResult || !window.Share) return;
+        var text = Share.generateShareText(
+          selectedTeam.shortName, computeResult.qualifyPercent,
+          computeResult.qualifyClean, computeResult.qualifyNRRDependent,
+          computeResult.totalScenarios, computeResult.detailedScenarios, appData.teams
+        );
+        Share.captureAsImage('#capture-area').then(function (blob) {
+          Share.shareNative('TossIPL', text, window.location.href, blob);
+        }).catch(function () {
+          Share.shareNative('TossIPL', text, window.location.href, null);
+        });
+      };
+    }
   }
 
   // ===== I18N HELPERS =====
+  function t(key, params) {
+    if (window.I18n) return I18n.t(key, params);
+    return key;
+  }
+
   function populateLanguageSelector() {
     if (!window.I18n) return;
     var select = document.getElementById('lang-select');
@@ -454,7 +656,7 @@
     if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
     if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
     if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
-    return n.toString();
+    return n.toLocaleString();
   }
 
   // ===== START =====
@@ -463,5 +665,4 @@
   } else {
     init();
   }
-
 })();
