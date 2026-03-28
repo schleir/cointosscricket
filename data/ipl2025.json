@@ -305,14 +305,14 @@
     },
     {
       "num": 21,
-      "home": "lsg",
-      "away": "kkr",
+      "home": "kkr",
+      "away": "lsg",
       "result": "win",
       "winner": "lsg",
       "completed": true,
-      "homeRuns": 238,
+      "homeRuns": 234,
       "homeOvers": 20.0,
-      "awayRuns": 234,
+      "awayRuns": 238,
       "awayOvers": 20.0
     },
     {
@@ -365,15 +365,15 @@
     },
     {
       "num": 26,
-      "home": "gt",
-      "away": "lsg",
+      "home": "lsg",
+      "away": "gt",
       "result": "win",
       "winner": "lsg",
       "completed": true,
-      "homeRuns": 180,
-      "homeOvers": 20.0,
-      "awayRuns": 186,
-      "awayOvers": 19.3
+      "homeRuns": 186,
+      "homeOvers": 19.3,
+      "awayRuns": 180,
+      "awayOvers": 20.0
     },
     {
       "num": 27,
@@ -473,15 +473,15 @@
     },
     {
       "num": 35,
-      "home": "dc",
-      "away": "gt",
+      "home": "gt",
+      "away": "dc",
       "result": "win",
       "winner": "gt",
       "completed": true,
-      "homeRuns": 203,
-      "homeOvers": 20.0,
-      "awayRuns": 204,
-      "awayOvers": 19.2
+      "homeRuns": 204,
+      "homeOvers": 19.2,
+      "awayRuns": 203,
+      "awayOvers": 20.0
     },
     {
       "num": 36,
@@ -521,14 +521,14 @@
     },
     {
       "num": 39,
-      "home": "gt",
-      "away": "kkr",
+      "home": "kkr",
+      "away": "gt",
       "result": "win",
       "winner": "gt",
       "completed": true,
-      "homeRuns": 198,
+      "homeRuns": 159,
       "homeOvers": 20.0,
-      "awayRuns": 159,
+      "awayRuns": 198,
       "awayOvers": 20.0
     },
     {
@@ -585,7 +585,12 @@
       "away": "pbks",
       "result": "no_result",
       "winner": null,
-      "completed": true
+      "completed": true,
+      "homeRuns": 7,
+      "homeOvers": 1.0,
+      "awayRuns": 201,
+      "awayOvers": 20.0,
+      "note": "PBKS batted first 201/4; KKR 7/0 in 1 ov when rain abandoned match"
     },
     {
       "num": 45,
@@ -613,26 +618,26 @@
     },
     {
       "num": 47,
-      "home": "gt",
-      "away": "rr",
+      "home": "rr",
+      "away": "gt",
       "result": "win",
       "winner": "rr",
       "completed": true,
-      "homeRuns": 209,
-      "homeOvers": 20.0,
-      "awayRuns": 212,
-      "awayOvers": 15.5
+      "homeRuns": 212,
+      "homeOvers": 15.5,
+      "awayRuns": 209,
+      "awayOvers": 20.0
     },
     {
       "num": 48,
-      "home": "kkr",
-      "away": "dc",
+      "home": "dc",
+      "away": "kkr",
       "result": "win",
       "winner": "kkr",
       "completed": true,
-      "homeRuns": 204,
+      "homeRuns": 190,
       "homeOvers": 20.0,
-      "awayRuns": 190,
+      "awayRuns": 204,
       "awayOvers": 20.0
     },
     {
@@ -713,7 +718,12 @@
       "away": "dc",
       "result": "no_result",
       "winner": null,
-      "completed": true
+      "completed": true,
+      "homeRuns": null,
+      "homeOvers": null,
+      "awayRuns": 133,
+      "awayOvers": 20.0,
+      "note": "DC batted first 133/7 in 20 ov; SRH innings never started due to rain"
     },
     {
       "num": 56,
@@ -745,7 +755,12 @@
       "away": "kkr",
       "result": "no_result",
       "winner": null,
-      "completed": true
+      "completed": true,
+      "homeRuns": null,
+      "homeOvers": null,
+      "awayRuns": null,
+      "awayOvers": null,
+      "note": "Match abandoned without a ball bowled due to persistent rain"
     },
     {
       "num": 59,
@@ -857,15 +872,15 @@
     },
     {
       "num": 68,
-      "home": "kkr",
-      "away": "srh",
+      "home": "srh",
+      "away": "kkr",
       "result": "win",
       "winner": "srh",
       "completed": true,
-      "homeRuns": 168,
-      "homeOvers": 18.4,
-      "awayRuns": 278,
-      "awayOvers": 20.0
+      "homeRuns": 278,
+      "homeOvers": 20.0,
+      "awayRuns": 168,
+      "awayOvers": 18.4
     },
     {
       "num": 69,
