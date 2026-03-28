@@ -8,6 +8,7 @@
   var worker = null;
   var isTestMode = false;
   var testN = null;
+  var currentFilter = 'all'; // 'all', 'clean', 'nrr_dependent', 'eliminated'
 
   function teamById(id) {
     if (!appData) return null;
@@ -250,19 +251,10 @@
     renderSpecificPaths(r.detailedScenarios);
 
     // Explorer setup
-    var matches = getEffectiveMatches();
-    var remaining = matches.filter(function (m) { return !m.completed; });
-    var totalScenarios = r.isExact ? r.totalScenarios : Math.pow(2, remaining.length);
-    var maxScenario = Math.min(totalScenarios, 1000000);
-
-    var slider = document.getElementById('explorer-slider');
-    var input = document.getElementById('explorer-input');
-    slider.max = maxScenario;
-    input.max = maxScenario;
-    document.getElementById('explorer-total').textContent =
-      t('outOf') + ' ' + formatNumber(totalScenarios);
-
-    renderScenario(0);
+    currentFilter = 'all';
+    updateFilterTabs(r);
+    updateExplorerForFilter();
+    renderScenarioAtFilterIndex(0);
   }
 
   // ===== SPECIFIC PATHS =====
@@ -313,7 +305,120 @@
     });
   }
 
-  // ===== SCENARIO EXPLORER =====
+  // ===== FILTER & EXPLORER =====
+
+  function updateFilterTabs(r) {
+    var tabs = document.querySelectorAll('.filter-tab');
+    tabs.forEach(function (tab) {
+      var filter = tab.getAttribute('data-filter');
+      var count = 0;
+      if (filter === 'all') count = r.totalScenarios;
+      else if (filter === 'clean') count = r.qualifyClean;
+      else if (filter === 'nrr_dependent') count = r.qualifyNRRDependent;
+      else if (filter === 'eliminated') count = r.eliminated;
+
+      // Update count display
+      var countSpan = tab.querySelector('.filter-count');
+      if (!countSpan) {
+        countSpan = document.createElement('span');
+        countSpan.className = 'filter-count';
+        tab.appendChild(countSpan);
+      }
+      countSpan.textContent = '(' + formatNumber(count) + ')';
+
+      // Set active state
+      tab.classList.toggle('active', filter === currentFilter);
+    });
+  }
+
+  function updateExplorerForFilter() {
+    var matches = getEffectiveMatches();
+    var remaining = matches.filter(function (m) { return !m.completed; });
+    var totalScenarios = computeResult.isExact ? computeResult.totalScenarios : Math.pow(2, remaining.length);
+    var filterCount = totalScenarios;
+
+    if (currentFilter === 'clean') filterCount = computeResult.qualifyClean;
+    else if (currentFilter === 'nrr_dependent') filterCount = computeResult.qualifyNRRDependent;
+    else if (currentFilter === 'eliminated') filterCount = computeResult.eliminated;
+
+    var maxScenario = Math.min(filterCount, 1000000);
+    if (maxScenario < 1) maxScenario = 1;
+
+    var slider = document.getElementById('explorer-slider');
+    var input = document.getElementById('explorer-input');
+    slider.max = maxScenario;
+    slider.value = 1;
+    input.max = maxScenario;
+    input.value = 1;
+    document.getElementById('explorer-total').textContent =
+      t('outOf') + ' ' + formatNumber(filterCount);
+  }
+
+  // Categorize a scenario on the client side (mirrors simulator logic)
+  function categorizeScenario(index) {
+    var matches = getEffectiveMatches();
+    var remaining = matches.filter(function (m) { return !m.completed; });
+    var completed = matches.filter(function (m) { return m.completed; });
+
+    var points = {};
+    appData.teams.forEach(function (tm) { points[tm.id] = 0; });
+
+    completed.forEach(function (m) {
+      if (m.result === 'no_result' || m.result === 'tie') {
+        points[m.home] += 1;
+        points[m.away] += 1;
+      } else if (m.result === 'win' && m.winner) {
+        points[m.winner] += 2;
+      }
+    });
+
+    remaining.forEach(function (m, j) {
+      var bit = (index >> j) & 1;
+      var winner = bit ? m.home : m.away;
+      points[winner] += 2;
+    });
+
+    var targetPts = points[selectedTeam.id];
+    var strictlyAbove = 0;
+    var samePts = 0;
+
+    appData.teams.forEach(function (tm) {
+      if (tm.id === selectedTeam.id) return;
+      if (points[tm.id] > targetPts) strictlyAbove++;
+      else if (points[tm.id] === targetPts) samePts++;
+    });
+
+    if (strictlyAbove >= 4) return 'eliminated';
+    if (strictlyAbove + samePts < 4) return 'clean';
+    return 'nrr_dependent';
+  }
+
+  // Find the Nth scenario matching the current filter (0-indexed)
+  function findFilteredScenarioIndex(filterIndex) {
+    if (currentFilter === 'all') return filterIndex;
+
+    var matches = getEffectiveMatches();
+    var remaining = matches.filter(function (m) { return !m.completed; });
+    var total = computeResult.isExact ? computeResult.totalScenarios : Math.pow(2, remaining.length);
+    var maxSearch = Math.min(total, 1000000);
+
+    var count = 0;
+    for (var i = 0; i < maxSearch; i++) {
+      var cat = categorizeScenario(i);
+      if (cat === currentFilter) {
+        if (count === filterIndex) return i;
+        count++;
+      }
+    }
+    return 0; // fallback
+  }
+
+  function renderScenarioAtFilterIndex(filterIndex) {
+    var scenarioIndex = findFilteredScenarioIndex(filterIndex);
+    renderScenario(scenarioIndex);
+  }
+
+  // ===== SCENARIO RENDERING =====
   function renderScenario(index) {
     var matches = getEffectiveMatches();
     var remaining = matches.filter(function (m) { return !m.completed; });
@@ -397,8 +502,52 @@
 
     renderStandingsTable(standings);
 
+    // Show match outcomes for this scenario
+    renderScenarioOutcomes(remaining, index);
+
     // Check if this scenario is NRR-dependent for the target team
     renderNRRGuidance(standings, points, remaining);
+  }
+
+  function renderScenarioOutcomes(remaining, scenarioIndex) {
+    var container = document.getElementById('scenario-outcomes');
+    if (remaining.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+
+    // Determine category
+    var category = categorizeScenario(scenarioIndex);
+    var categoryLabel = category === 'clean' ? t('qualified') || 'Qualifying'
+      : category === 'nrr_dependent' ? 'NRR Dependent'
+      : t('eliminatedLabel') || 'Eliminated';
+
+    var html = '<div class="scenario-outcomes-title">' +
+      (t('scenarioNumber') || 'Scenario') +
+      ' <span class="scenario-category-badge ' + category + '">' + categoryLabel + '</span>' +
+      '</div>';
+
+    html += '<ul class="outcome-list">';
+    remaining.forEach(function (m, j) {
+      var bit = (scenarioIndex >> j) & 1;
+      var winnerId = bit ? m.home : m.away;
+      var loserId = bit ? m.away : m.home;
+      var winnerTeam = teamById(winnerId);
+      var loserTeam = teamById(loserId);
+      var winnerName = winnerTeam ? winnerTeam.shortName : winnerId;
+      var loserName = loserTeam ? loserTeam.shortName : loserId;
+
+      html += '<li class="outcome-item">' +
+        '<span class="outcome-match">' + (winnerTeam ? winnerTeam.shortName : winnerId) +
+        ' vs ' + (loserTeam ? loserTeam.shortName : loserId) + '</span>' +
+        '<span class="outcome-result">' +
+        '<span class="winner-name">' + winnerName + '</span>' +
+        ' <span class="should-win">should win</span>' +
+        '</span></li>';
+    });
+    html += '</ul>';
+
+    container.innerHTML = html;
   }
 
   function addNRR(nrrData, homeId, awayId, homeRuns, homeOvers, awayRuns, awayOvers) {
@@ -544,11 +693,22 @@
       document.getElementById('info-content').classList.toggle('open');
     };
 
+    // Filter tabs
+    document.querySelectorAll('.filter-tab').forEach(function (tab) {
+      tab.onclick = function () {
+        currentFilter = this.getAttribute('data-filter');
+        document.querySelectorAll('.filter-tab').forEach(function (t) { t.classList.remove('active'); });
+        this.classList.add('active');
+        updateExplorerForFilter();
+        renderScenarioAtFilterIndex(0);
+      };
+    });
+
     // Explorer
     document.getElementById('explorer-slider').oninput = function () {
       var val = parseInt(this.value);
       document.getElementById('explorer-input').value = val;
-      renderScenario(val - 1);
+      renderScenarioAtFilterIndex(val - 1);
     };
 
     document.getElementById('explorer-input').onchange = function () {
@@ -557,7 +717,7 @@
       val = Math.max(1, Math.min(val, max));
       this.value = val;
       document.getElementById('explorer-slider').value = val;
-      renderScenario(val - 1);
+      renderScenarioAtFilterIndex(val - 1);
     };
 
     // Language

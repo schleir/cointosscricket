@@ -640,6 +640,148 @@ body {
   color: var(--text);
 }
 
+/* ===== FILTER TABS ===== */
+
+.filter-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-tab:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.filter-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+  font-weight: 600;
+}
+
+.filter-tab[data-filter="clean"].active {
+  background: var(--success);
+  border-color: var(--success);
+}
+
+.filter-tab[data-filter="nrr_dependent"].active {
+  background: var(--warning);
+  border-color: var(--warning);
+}
+
+.filter-tab[data-filter="eliminated"].active {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.filter-tab .filter-count {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  margin-left: 4px;
+}
+
+/* ===== SCENARIO OUTCOMES LIST ===== */
+
+.scenario-outcomes {
+  margin-top: 14px;
+  margin-bottom: 16px;
+}
+
+.scenario-outcomes-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.scenario-category-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-left: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  vertical-align: middle;
+}
+
+.scenario-category-badge.clean {
+  background: rgba(0, 212, 170, 0.15);
+  color: var(--success);
+}
+
+.scenario-category-badge.nrr_dependent {
+  background: rgba(255, 170, 0, 0.15);
+  color: var(--warning);
+}
+
+.scenario-category-badge.eliminated {
+  background: rgba(255, 68, 102, 0.15);
+  color: var(--danger);
+}
+
+.outcome-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+.outcome-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--bg-card);
+  border-radius: 6px;
+  font-size: 0.82rem;
+}
+
+.outcome-match {
+  color: var(--text-muted);
+  min-width: 100px;
+}
+
+.outcome-result {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+.outcome-result .winner-name {
+  color: var(--success);
+}
+
+.outcome-result .should-win {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 0.78rem;
+}
+
+@media (min-width: 480px) {
+  .outcome-list {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+}
+
 /* ===== TEST CONTROLS (test.html only) ===== */
 
 .test-controls {
