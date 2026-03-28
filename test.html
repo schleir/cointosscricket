@@ -122,11 +122,23 @@
 
       <div class="explorer" id="explorer-section">
         <h3 data-i18n="browseScenarios">Browse Scenarios</h3>
+
+        <!-- Filter tabs -->
+        <div class="filter-tabs" id="filter-tabs">
+          <button class="filter-tab active" data-filter="all">All</button>
+          <button class="filter-tab" data-filter="clean">Qualifying</button>
+          <button class="filter-tab" data-filter="nrr_dependent">NRR</button>
+          <button class="filter-tab" data-filter="eliminated">Eliminated</button>
+        </div>
+
         <div class="explorer-controls">
           <input type="number" class="explorer-input" id="explorer-input" min="1" value="1" placeholder="Scenario #">
           <span class="explorer-total" id="explorer-total"></span>
         </div>
         <input type="range" class="explorer-slider" id="explorer-slider" min="1" value="1">
+
+        <!-- Match outcomes for current scenario -->
+        <div class="scenario-outcomes" id="scenario-outcomes"></div>
       </div>
 
       <div id="nrr-guidance" class="nrr-guidance hidden">
