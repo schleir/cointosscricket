@@ -762,7 +762,24 @@
         computeResult.qualifyClean, computeResult.qualifyNRRDependent,
         computeResult.totalScenarios, computeResult.detailedScenarios, appData.teams
       );
-      Share.shareWhatsApp(text, window.location.href);
+      // Try native share with image first (works on mobile, user picks WhatsApp)
+      Share.captureAsImage('#capture-area').then(function (blob) {
+        if (blob && Share.canShareNatively()) {
+          var file = new File([blob], 'tossipl.png', { type: 'image/png' });
+          var shareData = { text: text + '\n\n' + window.location.href, files: [file] };
+          if (navigator.canShare && navigator.canShare(shareData)) {
+            navigator.share(shareData).catch(function () {
+              // User cancelled or error — fall back to text-only
+              Share.shareWhatsApp(text, window.location.href);
+            });
+            return;
+          }
+        }
+        // Fallback: text-only wa.me link
+        Share.shareWhatsApp(text, window.location.href);
+      }).catch(function () {
+        Share.shareWhatsApp(text, window.location.href);
+      });
     };
 
     document.getElementById('share-twitter').onclick = function () {
