@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <title>Redirecting to TossIPL Test Mode...</title>
   <script>
-    // Redirect to index.html with test mode enabled, preserving other params
+    // Redirect to index.html with n param (presence of n = test mode)
     var params = new URLSearchParams(window.location.search);
-    params.set('mode', 'test');
+    if (!params.has('n')) params.set('n', '');
     window.location.replace('index.html?' + params.toString());
   </script>
 </head>

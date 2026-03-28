@@ -20,10 +20,9 @@
     var resp = await fetch('data/ipl2025.json');
     appData = await resp.json();
 
-    // Detect test mode from URL param or filename
+    // Detect test mode: presence of 'n' param is sufficient
     var params = new URLSearchParams(window.location.search);
-    isTestMode = params.has('mode') && params.get('mode') === 'test' ||
-      window.location.pathname.indexOf('test.html') !== -1;
+    isTestMode = params.has('n');
 
     if (window.I18n) {
       I18n.init();
