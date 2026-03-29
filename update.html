@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TossIPL - Update Match Data</title>
+  <style>
+    :root { --bg: #0a0a0f; --card: #141420; --text: #f0f0f5; --muted: #8888aa; --accent: #00d4aa; --border: #2a2a3e; --danger: #ff4466; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 20px; max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 1.4rem; margin-bottom: 8px; }
+    h1 span { color: var(--accent); }
+    .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
+    .step { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .step-num { color: var(--accent); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .step p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+    .step a { color: var(--accent); }
+    textarea { width: 100%; height: 200px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: monospace; font-size: 0.8rem; resize: vertical; margin-top: 10px; }
+    textarea:focus { outline: none; border-color: var(--accent); }
+    button { padding: 10px 24px; border-radius: 8px; border: none; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); margin-left: 8px; }
+    .btn-danger { background: var(--danger); color: #fff; margin-left: 8px; }
+    .status { margin-top: 12px; padding: 10px; border-radius: 8px; font-size: 0.85rem; display: none; }
+    .status.success { display: block; background: rgba(0,212,170,0.1); color: var(--accent); }
+    .status.error { display: block; background: rgba(255,68,102,0.1); color: var(--danger); }
+    .status.info { display: block; background: rgba(136,136,170,0.1); color: var(--muted); }
+    .preview { margin-top: 12px; max-height: 300px; overflow: auto; font-family: monospace; font-size: 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; white-space: pre; }
+    .match-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .match-item { padding: 6px 10px; background: var(--bg); border-radius: 6px; font-size: 0.8rem; }
+    .match-item.completed { border-left: 3px solid var(--accent); }
+    .match-item.upcoming { border-left: 3px solid var(--border); }
+    .token-input { width: 100%; padding: 10px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-family: monospace; margin-top: 8px; }
+    .token-input:focus { outline: none; border-color: var(--accent); }
+    code { background: rgba(0,212,170,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<h1>Toss<span>IPL</span> — Update Match Data</h1>
+<p class="subtitle">Fetch latest IPL 2026 results and push updated data to GitHub.</p>
+
+<!-- Step 1: Extract data from ESPN -->
+<div class="step">
+  <div class="step-num">Step 1 — Get data from ESPN CricInfo</div>
+  <p>
+    Open <a href="https://www.espncricinfo.com/series/ipl-2026-1510719/match-schedule-fixtures-and-results" target="_blank">IPL 2026 Schedule on ESPN CricInfo</a> in a new tab.
+    Then open your browser console (<code>F12</code> → Console) and paste this:
+  </p>
+  <textarea id="bookmarklet" readonly onclick="this.select()" style="height:80px">copy(document.querySelector('#__NEXT_DATA__').textContent); alert('Copied! Paste it in the TossIPL update page.');</textarea>
+  <p style="margin-top:8px">Then come back here and paste the copied data:</p>
+  <textarea id="raw-input" placeholder="Paste the __NEXT_DATA__ JSON here..."></textarea>
+  <div style="margin-top:10px">
+    <button class="btn-primary" onclick="parseData()">Parse Data</button>
+  </div>
+  <div class="status" id="parse-status"></div>
+</div>
+
+<!-- Step 2: Review -->
+<div class="step hidden" id="step-review">
+  <div class="step-num">Step 2 — Review</div>
+  <p>Matches found: <strong id="match-count">0</strong> (<span id="completed-count">0</span> completed, <span id="upcoming-count">0</span> upcoming)</p>
+  <div class="match-summary" id="match-summary"></div>
+  <div style="margin-top:12px">
+    <button class="btn-secondary" onclick="showPreview()">Show JSON</button>
+  </div>
+  <div class="preview hidden" id="json-preview"></div>
+</div>
+
+<!-- Step 3: Push to GitHub -->
+<div class="step hidden" id="step-push">
+  <div class="step-num">Step 3 — Push to GitHub</div>
+  <p>Enter a GitHub Personal Access Token with <code>repo</code> scope to push directly. Token is stored in your browser only.</p>
+  <input type="password" class="token-input" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+  <div style="margin-top:10px">
+    <button class="btn-primary" id="push-btn" onclick="pushToGitHub()">Push to Repository</button>
+    <button class="btn-secondary" onclick="copyJSON()">Copy JSON</button>
+    <button class="btn-secondary" onclick="downloadJSON()">Download JSON</button>
+  </div>
+  <div class="status" id="push-status"></div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var generatedJSON = null;
+
+  // Team ID mapping from ESPN CricInfo names
+  var TEAM_MAP = {
+    'Chennai Super Kings': { id: 'csk', shortName: 'CSK', color: '#FCCA06' },
+    'Delhi Capitals': { id: 'dc', shortName: 'DC', color: '#004C93' },
+    'Gujarat Titans': { id: 'gt', shortName: 'GT', color: '#1C1C1C' },
+    'Kolkata Knight Riders': { id: 'kkr', shortName: 'KKR', color: '#3A225D' },
+    'Lucknow Super Giants': { id: 'lsg', shortName: 'LSG', color: '#A72056' },
+    'Mumbai Indians': { id: 'mi', shortName: 'MI', color: '#004BA0' },
+    'Punjab Kings': { id: 'pbks', shortName: 'PBKS', color: '#ED1B24' },
+    'Rajasthan Royals': { id: 'rr', shortName: 'RR', color: '#EA1A85' },
+    'Royal Challengers Bengaluru': { id: 'rcb', shortName: 'RCB', color: '#EC1C24' },
+    'Royal Challengers Bangalore': { id: 'rcb', shortName: 'RCB', color: '#EC1C24' },
+    'Sunrisers Hyderabad': { id: 'srh', shortName: 'SRH', color: '#FF822A' }
+  };
+
+  function teamIdFromName(name) {
+    if (!name) return null;
+    var clean = name.trim();
+    if (TEAM_MAP[clean]) return TEAM_MAP[clean].id;
+    // Fuzzy match
+    for (var key in TEAM_MAP) {
+      if (clean.toLowerCase().indexOf(TEAM_MAP[key].id) !== -1 ||
+          key.toLowerCase().indexOf(clean.toLowerCase()) !== -1) {
+        return TEAM_MAP[key].id;
+      }
+    }
+    return clean.toLowerCase().replace(/\s+/g, '_');
+  }
+
+  function parseOvers(str) {
+    if (!str) return 20;
+    var match = str.match(/([\d.]+)/);
+    return match ? parseFloat(match[1]) : 20;
+  }
+
+  function parseRuns(str) {
+    if (!str) return 0;
+    var match = str.match(/(\d+)/);
+    return match ? parseInt(match[1]) : 0;
+  }
+
+  window.parseData = function() {
+    var raw = document.getElementById('raw-input').value.trim();
+    var status = document.getElementById('parse-status');
+
+    if (!raw) {
+      status.className = 'status error';
+      status.textContent = 'Please paste the __NEXT_DATA__ JSON first.';
+      return;
+    }
+
+    var data;
+    try {
+      data = JSON.parse(raw);
+    } catch (e) {
+      status.className = 'status error';
+      status.textContent = 'Invalid JSON: ' + e.message;
+      return;
+    }
+
+    // Navigate the ESPN Next.js data structure to find matches
+    var matches = extractMatches(data);
+    if (!matches || matches.length === 0) {
+      status.className = 'status error';
+      status.textContent = 'Could not find match data in the JSON. Expected ESPN CricInfo __NEXT_DATA__ format.';
+      return;
+    }
+
+    // Build the IPL JSON structure
+    var teams = Object.values(TEAM_MAP).reduce(function(acc, t) {
+      if (!acc.find(function(x) { return x.id === t.id; })) {
+        acc.push({ id: t.id, name: '', shortName: t.shortName, color: t.color });
+      }
+      return acc;
+    }, []);
+
+    // Fill in full team names
+    for (var key in TEAM_MAP) {
+      var team = teams.find(function(t) { return t.id === TEAM_MAP[key].id; });
+      if (team && !team.name) team.name = key;
+    }
+
+    var iplData = {
+      season: '2026',
+      teams: teams,
+      matches: matches
+    };
+
+    generatedJSON = iplData;
+
+    // Show review
+    var completed = matches.filter(function(m) { return m.completed; });
+    var upcoming = matches.filter(function(m) { return !m.completed; });
+
+    document.getElementById('match-count').textContent = matches.length;
+    document.getElementById('completed-count').textContent = completed.length;
+    document.getElementById('upcoming-count').textContent = upcoming.length;
+
+    // Match summary
+    var summary = document.getElementById('match-summary');
+    summary.innerHTML = '';
+    matches.forEach(function(m) {
+      var div = document.createElement('div');
+      div.className = 'match-item ' + (m.completed ? 'completed' : 'upcoming');
+      var homeTeam = TEAM_MAP[Object.keys(TEAM_MAP).find(function(k) { return TEAM_MAP[k].id === m.home; })] || {};
+      var awayTeam = TEAM_MAP[Object.keys(TEAM_MAP).find(function(k) { return TEAM_MAP[k].id === m.away; })] || {};
+      var text = '#' + m.num + ' ' + (homeTeam.shortName || m.home) + ' vs ' + (awayTeam.shortName || m.away);
+      if (m.completed && m.winner) {
+        var winnerTeam = TEAM_MAP[Object.keys(TEAM_MAP).find(function(k) { return TEAM_MAP[k].id === m.winner; })] || {};
+        text += ' → ' + (winnerTeam.shortName || m.winner);
+      }
+      div.textContent = text;
+      summary.appendChild(div);
+    });
+
+    status.className = 'status success';
+    status.textContent = 'Parsed ' + matches.length + ' matches successfully!';
+    document.getElementById('step-review').classList.remove('hidden');
+    document.getElementById('step-push').classList.remove('hidden');
+
+    // Restore saved token
+    var saved = localStorage.getItem('tossipl_github_token');
+    if (saved) document.getElementById('github-token').value = saved;
+  };
+
+  function extractMatches(data) {
+    // ESPN CricInfo Next.js structure varies, try multiple paths
+    var content = null;
+
+    // Try common paths
+    try { content = data.props.pageProps.data.content.matches; } catch(e) {}
+    if (!content) try { content = data.props.pageProps.data.matchSchedule; } catch(e) {}
+    if (!content) try { content = data.props.pageProps.content.matches; } catch(e) {}
+    if (!content) try { content = data.props.pageProps.data.content.matchScheduleMap; } catch(e) {}
+
+    // Try to find matches array anywhere in the structure
+    if (!content) {
+      content = findMatchesDeep(data, 0);
+    }
+
+    if (!content) return null;
+
+    // If it's a map/object with date keys, flatten
+    if (!Array.isArray(content)) {
+      var flat = [];
+      for (var key in content) {
+        if (Array.isArray(content[key])) {
+          flat = flat.concat(content[key]);
+        } else if (content[key] && typeof content[key] === 'object') {
+          if (content[key].matchScheduleList) {
+            flat = flat.concat(content[key].matchScheduleList);
+          } else if (content[key].matches) {
+            flat = flat.concat(content[key].matches);
+          }
+        }
+      }
+      content = flat;
+    }
+
+    // Parse each match
+    var matches = [];
+    var matchNum = 0;
+    content.forEach(function(m) {
+      var parsed = parseMatch(m, ++matchNum);
+      if (parsed) matches.push(parsed);
+    });
+
+    return matches.length > 0 ? matches : null;
+  }
+
+  function findMatchesDeep(obj, depth) {
+    if (depth > 6 || !obj || typeof obj !== 'object') return null;
+
+    // Look for arrays of objects with team1/team2 or teams property
+    if (Array.isArray(obj) && obj.length > 5) {
+      var first = obj[0];
+      if (first && (first.team1 || first.teams || first.competitors || first.matchInfo)) {
+        return obj;
+      }
+    }
+
+    for (var key in obj) {
+      if (key === 'matches' || key === 'matchSchedule' || key === 'matchScheduleList') {
+        return obj[key];
+      }
+      var result = findMatchesDeep(obj[key], depth + 1);
+      if (result) return result;
+    }
+    return null;
+  }
+
+  function parseMatch(m, defaultNum) {
+    // Handle various ESPN data formats
+    var matchInfo = m.matchInfo || m;
+    var scorecard = m.scorecard || m.score || {};
+
+    // Teams
+    var team1Name = null, team2Name = null;
+    if (matchInfo.team1) {
+      team1Name = matchInfo.team1.name || matchInfo.team1.teamName || matchInfo.team1.longName;
+      team2Name = matchInfo.team2.name || matchInfo.team2.teamName || matchInfo.team2.longName;
+    } else if (matchInfo.teams) {
+      team1Name = matchInfo.teams[0] && (matchInfo.teams[0].name || matchInfo.teams[0].team.name || matchInfo.teams[0].team.longName);
+      team2Name = matchInfo.teams[1] && (matchInfo.teams[1].name || matchInfo.teams[1].team.name || matchInfo.teams[1].team.longName);
+    } else if (matchInfo.competitors) {
+      team1Name = matchInfo.competitors[0] && matchInfo.competitors[0].name;
+      team2Name = matchInfo.competitors[1] && matchInfo.competitors[1].name;
+    }
+
+    if (!team1Name || !team2Name) return null;
+
+    var homeId = teamIdFromName(team1Name);
+    var awayId = teamIdFromName(team2Name);
+
+    // Match number
+    var num = matchInfo.matchNumber || matchInfo.number || defaultNum;
+    if (typeof num === 'string') num = parseInt(num.replace(/[^\d]/g, '')) || defaultNum;
+
+    // Status
+    var state = matchInfo.state || matchInfo.status || matchInfo.matchStatus || '';
+    var isComplete = /complete|result|post|finished/i.test(state);
+
+    // For upcoming/no result matches
+    var result = {
+      num: num,
+      home: homeId,
+      away: awayId,
+      result: null,
+      winner: null,
+      completed: isComplete,
+      homeRuns: null,
+      homeOvers: null,
+      awayRuns: null,
+      awayOvers: null
+    };
+
+    if (!isComplete) return result;
+
+    // Winner
+    var winnerName = matchInfo.winnerTeam || matchInfo.winner;
+    if (winnerName && typeof winnerName === 'object') winnerName = winnerName.name || winnerName.longName;
+
+    // Scores
+    var scores = m.scores || scorecard;
+    var innings = m.innings || matchInfo.innings || [];
+
+    if (Array.isArray(innings) && innings.length >= 2) {
+      var inn1 = innings[0];
+      var inn2 = innings[1];
+      var team1Runs = inn1.runs || inn1.score || parseRuns(inn1.scoreValue || '');
+      var team1Overs = inn1.overs || parseOvers(inn1.overValue || '');
+      var team2Runs = inn2.runs || inn2.score || parseRuns(inn2.scoreValue || '');
+      var team2Overs = inn2.overs || parseOvers(inn2.overValue || '');
+
+      result.homeRuns = team1Runs;
+      result.homeOvers = team1Overs;
+      result.awayRuns = team2Runs;
+      result.awayOvers = team2Overs;
+    }
+
+    // Determine result type
+    var statusText = matchInfo.statusText || matchInfo.resultText || matchInfo.result || '';
+    if (/no result|abandoned|cancelled/i.test(statusText)) {
+      result.result = 'no_result';
+      result.winner = null;
+    } else if (/tie|super over/i.test(statusText)) {
+      result.result = 'tie';
+      result.winner = winnerName ? teamIdFromName(winnerName) : null;
+    } else {
+      result.result = 'win';
+      result.winner = winnerName ? teamIdFromName(winnerName) : null;
+    }
+
+    return result;
+  }
+
+  window.showPreview = function() {
+    var el = document.getElementById('json-preview');
+    el.classList.toggle('hidden');
+    if (!el.classList.contains('hidden')) {
+      el.textContent = JSON.stringify(generatedJSON, null, 2);
+    }
+  };
+
+  window.copyJSON = function() {
+    if (!generatedJSON) return;
+    navigator.clipboard.writeText(JSON.stringify(generatedJSON, null, 2)).then(function() {
+      alert('JSON copied to clipboard!');
+    });
+  };
+
+  window.downloadJSON = function() {
+    if (!generatedJSON) return;
+    var blob = new Blob([JSON.stringify(generatedJSON, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'ipl2025.json';
+    a.click();
+  };
+
+  window.pushToGitHub = function() {
+    if (!generatedJSON) return;
+    var token = document.getElementById('github-token').value.trim();
+    var status = document.getElementById('push-status');
+
+    if (!token) {
+      status.className = 'status error';
+      status.textContent = 'Please enter a GitHub token.';
+      return;
+    }
+
+    // Save token locally
+    localStorage.setItem('tossipl_github_token', token);
+
+    var content = btoa(unescape(encodeURIComponent(JSON.stringify(generatedJSON, null, 2))));
+    var owner = 'schleir';
+    var repo = 'test';
+    var path = 'data/ipl2025.json';
+    var branch = 'gh-pages';
+
+    status.className = 'status info';
+    status.textContent = 'Fetching current file SHA...';
+    document.getElementById('push-btn').disabled = true;
+
+    // Get current file SHA first
+    fetch('https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + path + '?ref=' + branch, {
+      headers: { 'Authorization': 'token ' + token }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(fileData) {
+      var sha = fileData.sha || null;
+
+      status.textContent = 'Pushing updated data...';
+
+      var body = {
+        message: 'Update IPL match data (' + new Date().toISOString().split('T')[0] + ')',
+        content: content,
+        branch: branch
+      };
+      if (sha) body.sha = sha;
+
+      return fetch('https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + path, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'token ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+    })
+    .then(function(r) {
+      if (!r.ok) throw new Error('Push failed: ' + r.status);
+      return r.json();
+    })
+    .then(function(result) {
+      status.className = 'status success';
+      status.textContent = 'Pushed successfully! The site will update in ~1 minute. Commit: ' + (result.commit ? result.commit.sha.substr(0, 7) : 'done');
+      document.getElementById('push-btn').disabled = false;
+    })
+    .catch(function(err) {
+      status.className = 'status error';
+      status.textContent = 'Error: ' + err.message;
+      document.getElementById('push-btn').disabled = false;
+    });
+  };
+
+})();
+</script>
+</body>
+</html>
