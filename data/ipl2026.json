@@ -79,13 +79,13 @@
       "num": 2,
       "home": "mi",
       "away": "kkr",
-      "result": null,
-      "winner": null,
-      "completed": false,
-      "homeRuns": null,
-      "homeOvers": null,
-      "awayRuns": null,
-      "awayOvers": null
+      "result": "win",
+      "winner": "mi",
+      "completed": true,
+      "homeRuns": 224,
+      "homeOvers": 19.1,
+      "awayRuns": 220,
+      "awayOvers": 20
     },
     {
       "num": 3,
