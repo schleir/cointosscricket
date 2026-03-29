@@ -1,4 +1,4 @@
-var CACHE_NAME = 'tossipl-v1';
+var CACHE_NAME = 'tossipl-v2';
 var ASSETS = [
   '/',
   '/index.html',
@@ -7,7 +7,7 @@ var ASSETS = [
   '/js/simulator.js',
   '/js/share.js',
   '/js/i18n.js',
-  '/data/ipl2025.json',
+  '/data/ipl2026.json',
   '/manifest.json'
 ];
 

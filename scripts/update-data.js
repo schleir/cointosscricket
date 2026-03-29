@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Fetches IPL 2026 match data from ESPN API and writes data/ipl2025.json
+// Fetches IPL match data from ESPN API and writes data/ipl<year>.json
 
 const https = require('https');
 const fs = require('fs');
@@ -169,7 +169,7 @@ async function main() {
     matches,
   };
 
-  const outPath = path.join(__dirname, '..', 'data', 'ipl2025.json');
+  const outPath = path.join(__dirname, '..', 'data', `ipl${iplData.season}.json`);
   fs.writeFileSync(outPath, JSON.stringify(iplData, null, 2) + '\n');
   console.log(`Written to ${outPath}`);
 

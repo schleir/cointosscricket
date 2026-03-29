@@ -29,13 +29,13 @@ jobs:
       - name: Check for changes
         id: diff
         run: |
-          git diff --quiet data/ipl2025.json && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+          git diff --quiet data/ && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
 
       - name: Commit and push
         if: steps.diff.outputs.changed == 'true'
         run: |
           git config user.name "TossIPL Bot"
           git config user.email "bot@tossipl.com"
-          git add data/ipl2025.json
+          git add data/
           git commit -m "Auto-update IPL match data ($(date -u +%Y-%m-%d))"
           git push

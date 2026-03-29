@@ -17,7 +17,7 @@
 
   // ===== INIT =====
   async function init() {
-    var resp = await fetch('data/ipl2025.json');
+    var resp = await fetch('data/ipl2026.json');
     appData = await resp.json();
 
     // Detect test mode: presence of 'n' param is sufficient
