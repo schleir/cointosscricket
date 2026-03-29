@@ -31,27 +31,47 @@ function teamIdFromName(name) {
       return TEAM_MAP[key].id;
     }
   }
+  console.warn(`[WARN] Unknown team name: "${clean}", using fallback ID`);
   return clean.toLowerCase().replace(/\s+/g, '_');
 }
 
 function fetchJSON(url) {
   return new Promise((resolve, reject) => {
+    console.log(`[FETCH] GET ${url}`);
+    const startTime = Date.now();
     https.get(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
         'Accept': 'application/json',
       }
     }, (res) => {
+      console.log(`[FETCH] Response: HTTP ${res.statusCode} (${Date.now() - startTime}ms)`);
       if (res.statusCode !== 200) {
-        return reject(new Error(`HTTP ${res.statusCode}`));
+        let body = '';
+        res.on('data', chunk => body += chunk);
+        res.on('end', () => {
+          console.error(`[FETCH] Response body: ${body.substring(0, 500)}`);
+          reject(new Error(`HTTP ${res.statusCode}`));
+        });
+        return;
       }
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
-        try { resolve(JSON.parse(data)); }
-        catch (e) { reject(new Error('Failed to parse JSON: ' + e.message)); }
+        console.log(`[FETCH] Received ${data.length} bytes`);
+        try {
+          const parsed = JSON.parse(data);
+          resolve(parsed);
+        } catch (e) {
+          console.error(`[FETCH] JSON parse failed: ${e.message}`);
+          console.error(`[FETCH] First 200 chars: ${data.substring(0, 200)}`);
+          reject(new Error('Failed to parse JSON: ' + e.message));
+        }
       });
-    }).on('error', reject);
+    }).on('error', (err) => {
+      console.error(`[FETCH] Network error: ${err.message}`);
+      reject(err);
+    });
   });
 }
 
@@ -68,17 +88,29 @@ function parseScore(scoreStr) {
 
 function parseMatch(event, defaultNum) {
   const comp = event.competitions?.[0];
-  if (!comp) return null;
+  if (!comp) {
+    console.warn(`[PARSE] Event "${event.name || event.id}" has no competitions, skipping`);
+    return null;
+  }
 
   const competitors = comp.competitors || [];
-  if (competitors.length < 2) return null;
+  if (competitors.length < 2) {
+    console.warn(`[PARSE] Event "${event.name || event.id}" has ${competitors.length} competitors, skipping`);
+    return null;
+  }
 
   const home = competitors.find(c => c.homeAway === 'home') || competitors[0];
   const away = competitors.find(c => c.homeAway === 'away') || competitors[1];
 
-  const homeId = teamIdFromName(home.team?.displayName);
-  const awayId = teamIdFromName(away.team?.displayName);
-  if (!homeId || !awayId) return null;
+  const homeName = home.team?.displayName;
+  const awayName = away.team?.displayName;
+  const homeId = teamIdFromName(homeName);
+  const awayId = teamIdFromName(awayName);
+
+  if (!homeId || !awayId) {
+    console.warn(`[PARSE] Could not resolve team IDs: home="${homeName}" (${homeId}), away="${awayName}" (${awayId}), skipping`);
+    return null;
+  }
 
   // Match number from description like "1st Match", "2nd Match"
   const desc = comp.description || '';
@@ -103,7 +135,7 @@ function parseMatch(event, defaultNum) {
 
   if (!isComplete) return result;
 
-  // Parse scores from linescores or score string
+  // Parse scores
   const homeScore = parseScore(home.score);
   const awayScore = parseScore(away.score);
   result.homeRuns = homeScore.runs;
@@ -111,9 +143,15 @@ function parseMatch(event, defaultNum) {
   result.awayRuns = awayScore.runs;
   result.awayOvers = awayScore.overs;
 
+  if (homeScore.runs === null) {
+    console.warn(`[PARSE] Match #${num} ${homeId} vs ${awayId}: could not parse home score from "${home.score}"`);
+  }
+  if (awayScore.runs === null) {
+    console.warn(`[PARSE] Match #${num} ${homeId} vs ${awayId}: could not parse away score from "${away.score}"`);
+  }
+
   // Winner
   const statusDetail = comp.status?.type?.detail || '';
-  const statusDesc = comp.status?.type?.description || '';
 
   if (/no result|abandoned|cancelled/i.test(statusDetail)) {
     result.result = 'no_result';
@@ -122,37 +160,58 @@ function parseMatch(event, defaultNum) {
     result.result = 'tie';
     if (home.winner === 'true' || home.winner === true) result.winner = homeId;
     else if (away.winner === 'true' || away.winner === true) result.winner = awayId;
+    else console.warn(`[PARSE] Match #${num} ${homeId} vs ${awayId}: tie/super over but no winner flag set`);
   } else {
     result.result = 'win';
     if (home.winner === 'true' || home.winner === true) result.winner = homeId;
     else if (away.winner === 'true' || away.winner === true) result.winner = awayId;
+    else console.warn(`[PARSE] Match #${num} ${homeId} vs ${awayId}: completed but no winner flag. status="${statusDetail}"`);
   }
+
+  console.log(`[MATCH] #${num} ${homeId} ${result.homeRuns}/${result.homeOvers} vs ${awayId} ${result.awayRuns}/${result.awayOvers} → ${result.result} (winner: ${result.winner || 'none'})`);
 
   return result;
 }
 
 async function main() {
-  console.log('Fetching IPL 2026 data from ESPN API...');
+  console.log(`[START] IPL data update - ${new Date().toISOString()}`);
+  console.log(`[START] API URL: ${ESPN_API_URL}`);
+
   const data = await fetchJSON(ESPN_API_URL);
 
   const events = data.events || [];
-  console.log(`Found ${events.length} events`);
+  console.log(`[DATA] Received ${events.length} events from API`);
+
+  if (events.length === 0) {
+    console.error('[ERROR] API returned 0 events. Response keys:', Object.keys(data).join(', '));
+    if (data.leagues) console.error('[ERROR] League:', JSON.stringify(data.leagues[0]?.name));
+    process.exit(1);
+  }
 
   const matches = [];
   let matchNum = 0;
+  let skipped = 0;
   for (const event of events) {
     const parsed = parseMatch(event, ++matchNum);
-    if (parsed) matches.push(parsed);
+    if (parsed) {
+      matches.push(parsed);
+    } else {
+      skipped++;
+    }
   }
 
+  console.log(`[DATA] Parsed ${matches.length} matches, skipped ${skipped}`);
+
   if (matches.length === 0) {
-    console.error('No matches parsed from API response');
+    console.error('[ERROR] No matches parsed from API response');
     process.exit(1);
   }
 
   const completed = matches.filter(m => m.completed);
   const upcoming = matches.filter(m => !m.completed);
-  console.log(`Parsed ${matches.length} matches (${completed.length} completed, ${upcoming.length} upcoming)`);
+  const withWinner = completed.filter(m => m.winner);
+  const noResult = completed.filter(m => m.result === 'no_result');
+  console.log(`[SUMMARY] ${completed.length} completed (${withWinner.length} with winner, ${noResult.length} no result), ${upcoming.length} upcoming`);
 
   // Build teams list (deduplicated)
   const teamsMap = {};
@@ -170,21 +229,45 @@ async function main() {
   };
 
   const outPath = path.join(__dirname, '..', 'data', `ipl${iplData.season}.json`);
-  fs.writeFileSync(outPath, JSON.stringify(iplData, null, 2) + '\n');
-  console.log(`Written to ${outPath}`);
 
-  // Print summary
+  // Check if file exists and compare
+  let changed = true;
+  if (fs.existsSync(outPath)) {
+    const existing = fs.readFileSync(outPath, 'utf8');
+    const newContent = JSON.stringify(iplData, null, 2) + '\n';
+    if (existing === newContent) {
+      console.log('[WRITE] No changes detected, data is already up to date');
+      changed = false;
+    } else {
+      const existingData = JSON.parse(existing);
+      const existingCompleted = existingData.matches?.filter(m => m.completed).length || 0;
+      console.log(`[WRITE] Data changed: ${existingCompleted} → ${completed.length} completed matches`);
+    }
+  } else {
+    console.log(`[WRITE] Creating new file: ${outPath}`);
+  }
+
+  fs.writeFileSync(outPath, JSON.stringify(iplData, null, 2) + '\n');
+  console.log(`[WRITE] Written to ${outPath} (${fs.statSync(outPath).size} bytes)`);
+
+  // Print standings
+  console.log('[STANDINGS]');
   for (const team of teams) {
     const w = completed.filter(m => m.winner === team.id).length;
     const l = completed.filter(m => m.completed && m.result === 'win' && m.winner && m.winner !== team.id &&
       (m.home === team.id || m.away === team.id)).length;
     const nr = completed.filter(m => m.result === 'no_result' && (m.home === team.id || m.away === team.id)).length;
     const pts = w * 2 + nr;
-    console.log(`  ${team.shortName}: ${w}W ${l}L ${nr}NR = ${pts}pts`);
+    if (w + l + nr > 0) {
+      console.log(`  ${team.shortName}: ${w}W ${l}L ${nr}NR = ${pts}pts`);
+    }
   }
+
+  console.log(`[DONE] Update complete - ${new Date().toISOString()}`);
 }
 
 main().catch(err => {
-  console.error('Error:', err.message);
+  console.error(`[FATAL] ${err.message}`);
+  console.error(`[FATAL] Stack: ${err.stack}`);
   process.exit(1);
 });
