@@ -1,0 +1,41 @@
+name: Update IPL Match Data
+
+on:
+  # Manual trigger from GitHub UI or API
+  workflow_dispatch:
+  # Auto-run daily at 6pm IST (12:30 UTC) during IPL season
+  # Uncomment during active IPL:
+  # schedule:
+  #   - cron: '30 12 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch and update match data
+        run: node scripts/update-data.js
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --quiet data/ipl2025.json && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "TossIPL Bot"
+          git config user.email "bot@tossipl.com"
+          git add data/ipl2025.json
+          git commit -m "Auto-update IPL match data ($(date -u +%Y-%m-%d))"
+          git push
