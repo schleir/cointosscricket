@@ -45,14 +45,12 @@
 
 <!-- Step 1: Extract data from ESPN -->
 <div class="step">
-  <div class="step-num">Step 1 — Get data from ESPN CricInfo</div>
+  <div class="step-num">Step 1 — Paste page source</div>
   <p>
-    Open <a href="https://www.espncricinfo.com/series/ipl-2026-1510719/match-schedule-fixtures-and-results" target="_blank">IPL 2026 Schedule on ESPN CricInfo</a> in a new tab.
-    Then open your browser console (<code>F12</code> → Console) and paste this:
+    Open <a href="https://www.espncricinfo.com/series/ipl-2026-1510719/match-schedule-fixtures-and-results" target="_blank">IPL 2026 Schedule on ESPN CricInfo</a>,
+    then <strong>View Source</strong> (<code>Ctrl+U</code> / <code>Cmd+U</code>), select all (<code>Ctrl+A</code>), copy, and paste below:
   </p>
-  <textarea id="bookmarklet" readonly onclick="this.select()" style="height:80px">copy(document.querySelector('#__NEXT_DATA__').textContent); alert('Copied! Paste it in the TossIPL update page.');</textarea>
-  <p style="margin-top:8px">Then come back here and paste the copied data:</p>
-  <textarea id="raw-input" placeholder="Paste the __NEXT_DATA__ JSON here..."></textarea>
+  <textarea id="raw-input" placeholder="Paste the full page source HTML here..."></textarea>
   <div style="margin-top:10px">
     <button class="btn-primary" onclick="parseData()">Parse Data</button>
   </div>
@@ -140,12 +138,19 @@
       return;
     }
 
+    // Extract __NEXT_DATA__ JSON from HTML, or parse directly if already JSON
+    var jsonStr = raw;
+    var nextDataMatch = raw.match(/<script\s+id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+    if (nextDataMatch) {
+      jsonStr = nextDataMatch[1];
+    }
+
     var data;
     try {
-      data = JSON.parse(raw);
+      data = JSON.parse(jsonStr);
     } catch (e) {
       status.className = 'status error';
-      status.textContent = 'Invalid JSON: ' + e.message;
+      status.textContent = 'Could not find valid JSON. Make sure you pasted the full page source (Ctrl+U, not just the rendered page).';
       return;
     }
 
