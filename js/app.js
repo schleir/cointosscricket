@@ -191,17 +191,6 @@
 
   function startComputation(team) {
     var matches = getEffectiveMatches();
-    var completed = matches.filter(function (m) { return m.completed; }).length;
-    var cacheKey = 'tossIPL_v3_' + team.id + '_md' + completed;
-
-    var cached = null;
-    try { cached = JSON.parse(localStorage.getItem(cacheKey)); } catch (e) {}
-
-    if (cached) {
-      computeResult = cached;
-      renderResults();
-      return;
-    }
 
     if (worker) worker.terminate();
 
@@ -213,7 +202,6 @@
         document.getElementById('progress-fill').style.width = msg.percent + '%';
       } else if (msg.type === 'result') {
         computeResult = msg;
-        try { localStorage.setItem(cacheKey, JSON.stringify(msg)); } catch (e) {}
         renderResults();
       }
     };
