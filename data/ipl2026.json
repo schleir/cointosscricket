@@ -91,13 +91,13 @@
       "num": 3,
       "home": "rr",
       "away": "csk",
-      "result": null,
-      "winner": null,
-      "completed": false,
-      "homeRuns": null,
-      "homeOvers": null,
-      "awayRuns": null,
-      "awayOvers": null
+      "result": "win",
+      "winner": "rr",
+      "completed": true,
+      "homeRuns": 128,
+      "homeOvers": 12.1,
+      "awayRuns": 127,
+      "awayOvers": 20
     },
     {
       "num": 4,
