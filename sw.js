@@ -1,4 +1,4 @@
-var CACHE_NAME = 'tossipl-v2';
+var CACHE_NAME = 'tossipl-v3';
 var ASSETS = [
   '/',
   '/index.html',

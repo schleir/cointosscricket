@@ -192,7 +192,7 @@
   function startComputation(team) {
     var matches = getEffectiveMatches();
     var completed = matches.filter(function (m) { return m.completed; }).length;
-    var cacheKey = 'tossIPL_v2_' + team.id + '_md' + completed;
+    var cacheKey = 'tossIPL_v3_' + team.id + '_md' + completed;
 
     var cached = null;
     try { cached = JSON.parse(localStorage.getItem(cacheKey)); } catch (e) {}
