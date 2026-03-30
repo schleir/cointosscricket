@@ -902,54 +902,6 @@
       "homeOvers": 20,
       "awayRuns": 198,
       "awayOvers": 20
-    },
-    {
-      "num": 0,
-      "home": "csk",
-      "away": "gt",
-      "result": "win",
-      "winner": "csk",
-      "completed": true,
-      "homeRuns": 172,
-      "homeOvers": 20,
-      "awayRuns": 157,
-      "awayOvers": 20
-    },
-    {
-      "num": 0,
-      "home": "mi",
-      "away": "lsg",
-      "result": "win",
-      "winner": "mi",
-      "completed": true,
-      "homeRuns": 182,
-      "homeOvers": 20,
-      "awayRuns": 101,
-      "awayOvers": 17
-    },
-    {
-      "num": 0,
-      "home": "gt",
-      "away": "mi",
-      "result": "win",
-      "winner": "gt",
-      "completed": true,
-      "homeRuns": 233,
-      "homeOvers": 20,
-      "awayRuns": 171,
-      "awayOvers": 19.1
-    },
-    {
-      "num": 0,
-      "home": "gt",
-      "away": "csk",
-      "result": "win",
-      "winner": "csk",
-      "completed": true,
-      "homeRuns": 214,
-      "homeOvers": 20,
-      "awayRuns": 171,
-      "awayOvers": 15.4
     }
   ]
 }
