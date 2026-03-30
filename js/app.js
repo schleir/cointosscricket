@@ -16,12 +16,21 @@
   }
 
   // ===== INIT =====
+  var DEFAULT_SEASON = '2026';
+
   async function init() {
-    var resp = await fetch('data/ipl2026.json');
+    var params = new URLSearchParams(window.location.search);
+    var season = params.get('season') || DEFAULT_SEASON;
+    var resp = await fetch('data/ipl' + season + '.json');
+    if (!resp.ok) {
+      // Fallback to default season if requested season not found
+      resp = await fetch('data/ipl' + DEFAULT_SEASON + '.json');
+      season = DEFAULT_SEASON;
+    }
     appData = await resp.json();
+    appData.currentSeason = season;
 
     // Detect test mode: presence of 'n' param is sufficient
-    var params = new URLSearchParams(window.location.search);
     isTestMode = params.has('n');
 
     if (window.I18n) {
@@ -123,7 +132,8 @@
     appData.teams.forEach(function (team) {
       var card = document.createElement('a');
       card.className = 'team-card';
-      card.href = '?team=' + team.id + (isTestMode && testN ? '&n=' + testN : '');
+      var seasonParam = appData.currentSeason !== DEFAULT_SEASON ? '&season=' + appData.currentSeason : '';
+      card.href = '?team=' + team.id + seasonParam + (isTestMode && testN ? '&n=' + testN : '');
       card.onclick = function (e) {
         e.preventDefault();
         selectTeam(team);
