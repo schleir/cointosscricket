@@ -30,7 +30,7 @@
       computing: 'Computing scenarios...',
       language: 'Language',
       guaranteed: 'Guaranteed',
-      nrrDependent: 'NRR coin toss',
+      nrrDependent: 'NRR dependent',
       eliminatedLabel: 'Eliminated',
       nrrRequired: 'NRR Required',
       specificPaths: 'Specific paths to playoffs',
