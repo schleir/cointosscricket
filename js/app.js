@@ -359,8 +359,7 @@
   function updateExplorerForFilter() {
     var matches = getEffectiveMatches();
     var remaining = matches.filter(function (m) { return !m.completed; });
-    var totalScenarios = computeResult.isExact ? computeResult.totalScenarios : Math.pow(2, remaining.length);
-    var filterCount = totalScenarios;
+    var filterCount = computeResult.totalScenarios;
 
     if (currentFilter === 'clean') filterCount = computeResult.qualifyClean;
     else if (currentFilter === 'nrr_dependent') filterCount = computeResult.qualifyNRRDependent;
@@ -424,8 +423,7 @@
 
     var matches = getEffectiveMatches();
     var remaining = matches.filter(function (m) { return !m.completed; });
-    var total = computeResult.isExact ? computeResult.totalScenarios : Math.pow(2, remaining.length);
-    var maxSearch = Math.min(total, 1000000);
+    var maxSearch = Math.min(computeResult.totalScenarios, 1000000);
 
     var count = 0;
     for (var i = 0; i < maxSearch; i++) {
