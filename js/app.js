@@ -45,6 +45,7 @@
     }
 
     renderTeamGrid();
+    renderCurrentStandings();
     setupEventListeners();
 
     // Check URL params (reuse params from above)
@@ -142,6 +143,85 @@
         '<div class="team-badge" style="background:' + team.color + '">' + team.shortName + '</div>' +
         '<div class="team-card-name">' + team.name + '</div>';
       grid.appendChild(card);
+    });
+  }
+
+  // ===== HOME STANDINGS =====
+  function renderCurrentStandings() {
+    var matches = appData.matches;
+    var completed = matches.filter(function (m) { return m.completed; });
+    var total = matches.length;
+
+    // Build standings from completed matches
+    var stats = {};
+    appData.teams.forEach(function (t) {
+      stats[t.id] = { points: 0, won: 0, lost: 0, noResult: 0,
+        runsScored: 0, oversPlayed: 0, runsConceded: 0, oversBowled: 0 };
+    });
+
+    completed.forEach(function (m) {
+      if (m.result === 'no_result') {
+        stats[m.home].points += 1; stats[m.away].points += 1;
+        stats[m.home].noResult++; stats[m.away].noResult++;
+      } else if (m.result === 'win' && m.winner) {
+        var loser = m.winner === m.home ? m.away : m.home;
+        stats[m.winner].points += 2; stats[m.winner].won++;
+        stats[loser].lost++;
+        if (m.homeRuns != null) {
+          var hOv = oversToDecimal(m.homeOvers);
+          var aOv = oversToDecimal(m.awayOvers);
+          stats[m.home].runsScored += m.homeRuns; stats[m.home].oversPlayed += hOv;
+          stats[m.home].runsConceded += m.awayRuns; stats[m.home].oversBowled += aOv;
+          stats[m.away].runsScored += m.awayRuns; stats[m.away].oversPlayed += aOv;
+          stats[m.away].runsConceded += m.homeRuns; stats[m.away].oversBowled += hOv;
+        }
+      }
+    });
+
+    var standings = appData.teams.map(function (t) {
+      var s = stats[t.id];
+      var nrr = 0;
+      if (s.oversPlayed > 0 && s.oversBowled > 0) {
+        nrr = (s.runsScored / s.oversPlayed) - (s.runsConceded / s.oversBowled);
+      }
+      return {
+        teamId: t.id, shortName: t.shortName, name: t.name, color: t.color,
+        played: s.won + s.lost + s.noResult, won: s.won, lost: s.lost,
+        points: s.points, nrr: Math.round(nrr * 1000) / 1000
+      };
+    });
+
+    standings.sort(function (a, b) {
+      if (b.points !== a.points) return b.points - a.points;
+      if (b.nrr !== a.nrr) return b.nrr - a.nrr;
+      return a.name.localeCompare(b.name);
+    });
+
+    // Meta text
+    var meta = document.getElementById('current-standings-meta');
+    meta.innerHTML = '<strong>' + completed.length + '</strong> of <strong>' + total +
+      '</strong> league matches completed &middot; IPL ' + (appData.season || appData.currentSeason);
+
+    // Table
+    var tbody = document.getElementById('current-standings-body');
+    tbody.innerHTML = '';
+    standings.forEach(function (s, idx) {
+      var rank = idx + 1;
+      var tr = document.createElement('tr');
+      if (rank <= 4) tr.classList.add('qualify-zone');
+      var nrrStr = s.nrr >= 0 ? '+' + s.nrr.toFixed(3) : s.nrr.toFixed(3);
+      tr.innerHTML =
+        '<td class="rank">' + rank + '</td>' +
+        '<td><div class="team-cell">' +
+          '<span class="team-dot" style="background:' + s.color + '"></span>' +
+          '<span class="team-name">' + s.shortName + '</span>' +
+        '</div></td>' +
+        '<td>' + s.played + '</td>' +
+        '<td>' + s.won + '</td>' +
+        '<td>' + s.lost + '</td>' +
+        '<td class="pts">' + s.points + '</td>' +
+        '<td>' + nrrStr + '</td>';
+      tbody.appendChild(tr);
     });
   }
 

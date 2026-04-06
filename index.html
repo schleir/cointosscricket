@@ -36,6 +36,25 @@
     <p class="page-subtitle" data-i18n="tagline">What if a coin toss decided the IPL?</p>
     <h2 class="page-title" style="font-size:1.1rem; margin-bottom:20px" data-i18n="selectTeam">Select Your Team</h2>
     <div class="team-grid" id="team-grid"></div>
+
+    <!-- Current Standings -->
+    <div id="current-standings" class="current-standings">
+      <div class="current-standings-meta" id="current-standings-meta"></div>
+      <table class="standings-table" id="current-standings-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th data-i18n="team">Team</th>
+            <th data-i18n="played">P</th>
+            <th data-i18n="won">W</th>
+            <th data-i18n="lost">L</th>
+            <th data-i18n="points">Pts</th>
+            <th>NRR</th>
+          </tr>
+        </thead>
+        <tbody id="current-standings-body"></tbody>
+      </table>
+    </div>
   </main>
 
   <!-- PAGE: Analysis -->
