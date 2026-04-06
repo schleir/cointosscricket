@@ -134,7 +134,7 @@ function compute(teams, matches, targetTeamId, topN) {
       }
 
       // Categorize
-      var cat = categorize(pts, targetIdx, topN, teams, baseNRR);
+      var cat = categorize(pts, targetIdx, topN, teams, baseNRR, N);
 
       if (cat === 'clean') {
         qualifyClean++;
@@ -178,7 +178,7 @@ function compute(teams, matches, targetTeamId, topN) {
         }
       }
 
-      var cat2 = categorize(pts2, targetIdx, topN, teams, baseNRR);
+      var cat2 = categorize(pts2, targetIdx, topN, teams, baseNRR, N);
       if (cat2 === 'clean') {
         qualifyClean++;
       } else if (cat2 === 'nrr_dependent') {
@@ -224,7 +224,7 @@ function compute(teams, matches, targetTeamId, topN) {
 }
 
 // Categorize a scenario: 'clean', 'nrr_dependent', or 'eliminated'
-function categorize(points, targetIdx, topN, teams, nrr) {
+function categorize(points, targetIdx, topN, teams, nrr, remainingCount) {
   var targetPts = points[targetIdx];
 
   // Count teams strictly above in points
@@ -267,6 +267,11 @@ function categorize(points, targetIdx, topN, teams, nrr) {
 
   // If current NRR already secures qualification
   if (betterNRR < spotsAvailable) return 'clean';
+
+  // If no remaining matches, NRR is final — not dependent, it's decided
+  if (remainingCount === 0) {
+    return betterNRR >= spotsAvailable ? 'eliminated' : 'clean';
+  }
 
   // NRR-dependent: could go either way depending on match margins
   return 'nrr_dependent';
