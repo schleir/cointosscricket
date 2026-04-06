@@ -316,17 +316,29 @@
     document.getElementById('hero-team-name').textContent = selectedTeam.name;
     document.getElementById('hero-percent').textContent = r.qualifyPercent.toFixed(1) + '%';
 
+    var seasonComplete = r.remainingMatches === 0;
+    var qualified = r.qualifyPercent >= 99.9;
+
     // Detail text
-    var effectiveQualify = r.qualifyClean + Math.round(0.5 * r.qualifyNRRDependent);
     var detailEl = document.getElementById('hero-detail');
-    detailEl.innerHTML =
-      '<strong>' + formatNumber(effectiveQualify) + '</strong> ' +
-      t('outOf') + ' <strong>' + formatNumber(r.totalScenarios) + '</strong> ' +
-      t('scenarios') + ' ' + t('leadToPlayoffs');
+    if (seasonComplete) {
+      detailEl.innerHTML = qualified
+        ? 'Season complete &mdash; <strong>Qualified for playoffs</strong>'
+        : 'Season complete &mdash; <strong>Did not qualify</strong>';
+    } else {
+      var effectiveQualify = r.qualifyClean + Math.round(0.5 * r.qualifyNRRDependent);
+      detailEl.innerHTML =
+        '<strong>' + formatNumber(effectiveQualify) + '</strong> ' +
+        t('outOf') + ' <strong>' + formatNumber(r.totalScenarios) + '</strong> ' +
+        t('scenarios') + ' ' + t('leadToPlayoffs');
+    }
 
     // Badge
     var badge = document.getElementById('hero-badge');
-    if (r.isExact) {
+    if (seasonComplete) {
+      badge.className = 'hero-badge exact';
+      badge.textContent = 'Final Result';
+    } else if (r.isExact) {
       badge.className = 'hero-badge exact';
       badge.textContent = t('exactCalculation');
     } else {
@@ -350,14 +362,42 @@
     document.getElementById('pct-nrr').textContent = nrrPct.toFixed(1) + '%';
     document.getElementById('pct-elim').textContent = elimPct.toFixed(1) + '%';
 
-    // Specific paths
-    renderSpecificPaths(r.detailedScenarios);
+    // Hide sections not relevant for completed seasons
+    var explorerSection = document.getElementById('explorer-section');
+    var nrrGuidance = document.getElementById('nrr-guidance');
+    var specificPaths = document.getElementById('specific-paths');
+    var breakdownEl = document.getElementById('breakdown');
+    var statusRow = document.querySelector('.status-row');
 
-    // Explorer setup
-    currentFilter = 'all';
-    updateFilterTabs(r);
-    updateExplorerForFilter();
-    renderScenarioAtFilterIndex(0);
+    if (seasonComplete) {
+      explorerSection.classList.add('hidden');
+      nrrGuidance.classList.add('hidden');
+      specificPaths.classList.add('hidden');
+      breakdownEl.classList.add('hidden');
+      if (statusRow) statusRow.classList.add('hidden');
+    } else {
+      explorerSection.classList.remove('hidden');
+      breakdownEl.classList.remove('hidden');
+      if (statusRow) statusRow.classList.remove('hidden');
+
+      // Specific paths
+      renderSpecificPaths(r.detailedScenarios);
+
+      // Explorer setup
+      currentFilter = 'all';
+      updateFilterTabs(r);
+      updateExplorerForFilter();
+      renderScenarioAtFilterIndex(0);
+    }
+
+    // Render final standings
+    renderScenario(0);
+
+    // Re-hide NRR guidance for completed seasons
+    if (seasonComplete) {
+      nrrGuidance.classList.add('hidden');
+      document.getElementById('scenario-outcomes').innerHTML = '';
+    }
   }
 
   // ===== SPECIFIC PATHS =====
