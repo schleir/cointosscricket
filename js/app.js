@@ -323,8 +323,8 @@
     var detailEl = document.getElementById('hero-detail');
     if (seasonComplete) {
       detailEl.innerHTML = qualified
-        ? 'Season complete &mdash; <strong>Qualified for playoffs</strong>'
-        : 'Season complete &mdash; <strong>Did not qualify</strong>';
+        ? 'League complete &mdash; <strong>Qualified for playoffs</strong>'
+        : 'League complete &mdash; <strong>Did not qualify</strong>';
     } else {
       var effectiveQualify = r.qualifyClean + Math.round(0.5 * r.qualifyNRRDependent);
       detailEl.innerHTML =
