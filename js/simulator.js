@@ -61,7 +61,7 @@ function compute(teams, matches, targetTeamId, topN) {
       baseNoResults[awayIdx]++;
       if (m.homeRuns != null) {
         accumulateNRR(baseRunsScored, baseOversPlayed, baseRunsConceded, baseOversBowled,
-          homeIdx, awayIdx, m.homeRuns, m.homeOvers, m.awayRuns, m.awayOvers);
+          homeIdx, awayIdx, m.homeRuns, m.homeOvers, m.homeAllOut, m.awayRuns, m.awayOvers, m.awayAllOut);
       }
     } else if (m.result === 'win' && m.winner) {
       var winnerIdx = teamIndex[m.winner];
@@ -71,7 +71,7 @@ function compute(teams, matches, targetTeamId, topN) {
       baseLosses[loserIdx]++;
       if (m.homeRuns != null) {
         accumulateNRR(baseRunsScored, baseOversPlayed, baseRunsConceded, baseOversBowled,
-          homeIdx, awayIdx, m.homeRuns, m.homeOvers, m.awayRuns, m.awayOvers);
+          homeIdx, awayIdx, m.homeRuns, m.homeOvers, m.homeAllOut, m.awayRuns, m.awayOvers, m.awayAllOut);
       }
     }
   }
@@ -332,10 +332,11 @@ function computeNRRRequirement(points, targetIdx, topN, teams, nrr, remaining, N
 }
 
 // Accumulate NRR data for a match
+// ICC rule: if a team is all out, use the full over allocation (20) for NRR
 function accumulateNRR(runsScored, oversPlayed, runsConceded, oversBowled,
-  homeIdx, awayIdx, homeRuns, homeOvers, awayRuns, awayOvers) {
-  var homeOversDecimal = oversToDecimal(homeOvers);
-  var awayOversDecimal = oversToDecimal(awayOvers);
+  homeIdx, awayIdx, homeRuns, homeOvers, homeAllOut, awayRuns, awayOvers, awayAllOut) {
+  var homeOversDecimal = homeAllOut ? 20 : oversToDecimal(homeOvers);
+  var awayOversDecimal = awayAllOut ? 20 : oversToDecimal(awayOvers);
 
   // Home team: scored homeRuns in homeOvers, conceded awayRuns in awayOvers
   runsScored[homeIdx] += homeRuns;

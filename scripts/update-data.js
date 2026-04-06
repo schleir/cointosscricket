@@ -76,13 +76,17 @@ function fetchJSON(url) {
 }
 
 function parseScore(scoreStr) {
-  if (!scoreStr) return { runs: null, overs: null };
+  if (!scoreStr) return { runs: null, overs: null, allOut: false };
   // Format: "203/4 (15.4/20 ov, target 202)" or "180/5 (20.0 Ov)" or "180/5" or "180"
+  // "180" without /wickets means all out; "180/10" also means all out
   const runsMatch = scoreStr.match(/^(\d+)/);
+  const wicketsMatch = scoreStr.match(/^(\d+)\/(\d+)/);
   const oversMatch = scoreStr.match(/\(([\d.]+)(?:\/\d+)?\s*ov/i);
+  const allOut = !wicketsMatch || parseInt(wicketsMatch[2]) >= 10;
   return {
     runs: runsMatch ? parseInt(runsMatch[1]) : null,
     overs: oversMatch ? parseFloat(oversMatch[1]) : 20,
+    allOut: allOut,
   };
 }
 
@@ -129,8 +133,10 @@ function parseMatch(event, defaultNum) {
     completed: isComplete,
     homeRuns: null,
     homeOvers: null,
+    homeAllOut: false,
     awayRuns: null,
     awayOvers: null,
+    awayAllOut: false,
   };
 
   if (!isComplete) return result;
@@ -140,8 +146,10 @@ function parseMatch(event, defaultNum) {
   const awayScore = parseScore(away.score);
   result.homeRuns = homeScore.runs;
   result.homeOvers = homeScore.overs;
+  result.homeAllOut = homeScore.allOut;
   result.awayRuns = awayScore.runs;
   result.awayOvers = awayScore.overs;
+  result.awayAllOut = awayScore.allOut;
 
   if (homeScore.runs === null) {
     console.warn(`[PARSE] Match #${num} ${homeId} vs ${awayId}: could not parse home score from "${home.score}"`);

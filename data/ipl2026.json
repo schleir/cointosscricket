@@ -72,8 +72,10 @@
       "completed": true,
       "homeRuns": 203,
       "homeOvers": 15.4,
+      "homeAllOut": false,
       "awayRuns": 201,
-      "awayOvers": 20
+      "awayOvers": 20,
+      "awayAllOut": false
     },
     {
       "num": 2,
@@ -84,8 +86,10 @@
       "completed": true,
       "homeRuns": 224,
       "homeOvers": 19.1,
+      "homeAllOut": false,
       "awayRuns": 220,
-      "awayOvers": 20
+      "awayOvers": 20,
+      "awayAllOut": false
     },
     {
       "num": 3,
@@ -96,8 +100,10 @@
       "completed": true,
       "homeRuns": 128,
       "homeOvers": 12.1,
+      "homeAllOut": false,
       "awayRuns": 127,
-      "awayOvers": 20
+      "awayOvers": 20,
+      "awayAllOut": true
     },
     {
       "num": 4,
@@ -108,8 +114,10 @@
       "completed": true,
       "homeRuns": 165,
       "homeOvers": 19.1,
+      "homeAllOut": false,
       "awayRuns": 162,
-      "awayOvers": 20
+      "awayOvers": 20,
+      "awayAllOut": false
     },
     {
       "num": 5,
@@ -120,8 +128,10 @@
       "completed": true,
       "homeRuns": 141,
       "homeOvers": 20,
+      "homeAllOut": true,
       "awayRuns": 145,
-      "awayOvers": 17.1
+      "awayOvers": 17.1,
+      "awayAllOut": false
     },
     {
       "num": 6,
@@ -132,8 +142,10 @@
       "completed": true,
       "homeRuns": 161,
       "homeOvers": 16,
+      "homeAllOut": true,
       "awayRuns": 226,
-      "awayOvers": 20
+      "awayOvers": 20,
+      "awayAllOut": false
     },
     {
       "num": 7,
@@ -144,8 +156,10 @@
       "completed": true,
       "homeRuns": 209,
       "homeOvers": 20,
+      "homeAllOut": false,
       "awayRuns": 210,
-      "awayOvers": 18.4
+      "awayOvers": 18.4,
+      "awayAllOut": false
     },
     {
       "num": 8,
@@ -156,8 +170,10 @@
       "completed": true,
       "homeRuns": 164,
       "homeOvers": 18.1,
+      "homeAllOut": false,
       "awayRuns": 162,
-      "awayOvers": 20
+      "awayOvers": 20,
+      "awayAllOut": false
     },
     {
       "num": 9,
@@ -168,8 +184,10 @@
       "completed": true,
       "homeRuns": 204,
       "homeOvers": 20,
+      "homeAllOut": false,
       "awayRuns": 210,
-      "awayOvers": 20
+      "awayOvers": 20,
+      "awayAllOut": false
     },
     {
       "num": 10,
@@ -180,8 +198,10 @@
       "completed": true,
       "homeRuns": 156,
       "homeOvers": 20,
+      "homeAllOut": false,
       "awayRuns": 160,
-      "awayOvers": 19.5
+      "awayOvers": 19.5,
+      "awayAllOut": false
     },
     {
       "num": 11,
@@ -192,8 +212,10 @@
       "completed": true,
       "homeRuns": 250,
       "homeOvers": 20,
+      "homeAllOut": false,
       "awayRuns": 207,
-      "awayOvers": 19.4
+      "awayOvers": 19.4,
+      "awayAllOut": true
     },
     {
       "num": 12,
@@ -204,8 +226,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 13,
@@ -216,8 +240,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 14,
@@ -228,8 +254,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 15,
@@ -240,8 +268,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 16,
@@ -252,8 +282,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 17,
@@ -264,8 +296,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 18,
@@ -276,8 +310,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 19,
@@ -288,8 +324,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 20,
@@ -300,8 +338,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 21,
@@ -312,8 +352,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 22,
@@ -324,8 +366,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 23,
@@ -336,8 +380,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 24,
@@ -348,8 +394,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 25,
@@ -360,8 +408,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 26,
@@ -372,8 +422,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 27,
@@ -384,8 +436,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 28,
@@ -396,8 +450,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 29,
@@ -408,8 +464,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 30,
@@ -420,8 +478,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 31,
@@ -432,8 +492,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 32,
@@ -444,8 +506,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 33,
@@ -456,8 +520,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 34,
@@ -468,8 +534,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 35,
@@ -480,8 +548,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 36,
@@ -492,8 +562,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 37,
@@ -504,8 +576,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 38,
@@ -516,8 +590,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 39,
@@ -528,8 +604,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 40,
@@ -540,8 +618,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 41,
@@ -552,8 +632,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 42,
@@ -564,8 +646,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 43,
@@ -576,8 +660,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 44,
@@ -588,8 +674,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 45,
@@ -600,8 +688,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 46,
@@ -612,8 +702,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 47,
@@ -624,8 +716,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 48,
@@ -636,8 +730,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 49,
@@ -648,8 +744,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 50,
@@ -660,8 +758,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 51,
@@ -672,8 +772,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 52,
@@ -684,8 +786,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 53,
@@ -696,8 +800,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 54,
@@ -708,8 +814,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 55,
@@ -720,8 +828,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 56,
@@ -732,8 +842,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 57,
@@ -744,8 +856,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 58,
@@ -756,8 +870,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 59,
@@ -768,8 +884,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 60,
@@ -780,8 +898,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 61,
@@ -792,8 +912,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 62,
@@ -804,8 +926,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 63,
@@ -816,8 +940,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 64,
@@ -828,8 +954,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 65,
@@ -840,8 +968,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 66,
@@ -852,8 +982,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 67,
@@ -864,8 +996,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 68,
@@ -876,8 +1010,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 69,
@@ -888,8 +1024,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     },
     {
       "num": 70,
@@ -900,8 +1038,10 @@
       "completed": false,
       "homeRuns": null,
       "homeOvers": null,
+      "homeAllOut": false,
       "awayRuns": null,
-      "awayOvers": null
+      "awayOvers": null,
+      "awayAllOut": false
     }
   ]
 }

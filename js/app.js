@@ -168,8 +168,8 @@
         stats[m.winner].points += 2; stats[m.winner].won++;
         stats[loser].lost++;
         if (m.homeRuns != null) {
-          var hOv = oversToDecimal(m.homeOvers);
-          var aOv = oversToDecimal(m.awayOvers);
+          var hOv = m.homeAllOut ? 20 : oversToDecimal(m.homeOvers);
+          var aOv = m.awayAllOut ? 20 : oversToDecimal(m.awayOvers);
           stats[m.home].runsScored += m.homeRuns; stats[m.home].oversPlayed += hOv;
           stats[m.home].runsConceded += m.awayRuns; stats[m.home].oversBowled += aOv;
           stats[m.away].runsScored += m.awayRuns; stats[m.away].oversPlayed += aOv;
@@ -552,7 +552,7 @@
         noResults[m.home]++;
         noResults[m.away]++;
         if (m.homeRuns != null) {
-          addNRR(nrrData, m.home, m.away, m.homeRuns, m.homeOvers, m.awayRuns, m.awayOvers);
+          addNRR(nrrData, m.home, m.away, m.homeRuns, m.homeOvers, m.homeAllOut, m.awayRuns, m.awayOvers, m.awayAllOut);
         }
       } else if (m.result === 'win' && m.winner) {
         points[m.winner] += 2;
@@ -560,7 +560,7 @@
         var loser = m.winner === m.home ? m.away : m.home;
         losses[loser]++;
         if (m.homeRuns != null) {
-          addNRR(nrrData, m.home, m.away, m.homeRuns, m.homeOvers, m.awayRuns, m.awayOvers);
+          addNRR(nrrData, m.home, m.away, m.homeRuns, m.homeOvers, m.homeAllOut, m.awayRuns, m.awayOvers, m.awayAllOut);
         }
       }
     });
@@ -651,9 +651,9 @@
     container.innerHTML = html;
   }
 
-  function addNRR(nrrData, homeId, awayId, homeRuns, homeOvers, awayRuns, awayOvers) {
-    var hOv = oversToDecimal(homeOvers);
-    var aOv = oversToDecimal(awayOvers);
+  function addNRR(nrrData, homeId, awayId, homeRuns, homeOvers, homeAllOut, awayRuns, awayOvers, awayAllOut) {
+    var hOv = homeAllOut ? 20 : oversToDecimal(homeOvers);
+    var aOv = awayAllOut ? 20 : oversToDecimal(awayOvers);
     nrrData[homeId].runsScored += homeRuns;
     nrrData[homeId].oversPlayed += hOv;
     nrrData[homeId].runsConceded += awayRuns;
