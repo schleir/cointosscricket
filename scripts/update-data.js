@@ -232,6 +232,7 @@ async function main() {
 
   const iplData = {
     season: '2026',
+    lastUpdated: new Date().toISOString(),
     teams,
     matches,
   };

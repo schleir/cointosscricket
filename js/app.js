@@ -199,8 +199,13 @@
 
     // Meta text
     var meta = document.getElementById('current-standings-meta');
-    meta.innerHTML = '<strong>' + completed.length + '</strong> of <strong>' + total +
+    var metaHtml = '<strong>' + completed.length + '</strong> of <strong>' + total +
       '</strong> league matches completed &middot; IPL ' + (appData.season || appData.currentSeason);
+    if (appData.lastUpdated) {
+      var updated = new Date(appData.lastUpdated);
+      metaHtml += '<br>Last updated: ' + updated.toLocaleString();
+    }
+    meta.innerHTML = metaHtml;
 
     // Table
     var tbody = document.getElementById('current-standings-body');
