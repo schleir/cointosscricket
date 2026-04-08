@@ -5,8 +5,6 @@ on:
   schedule:
     # During IPL (Mar-May): every 5 minutes during match hours (2PM-7PM UTC = 7:30PM-12:30AM IST)
     - cron: '*/5 14-19 * 3-5 *'
-    # Off-season: daily at 12:30 UTC (6PM IST)
-    - cron: '30 12 * 1-2,6-12 *'
 
 permissions:
   contents: write
