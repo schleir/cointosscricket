@@ -203,7 +203,7 @@
       '</strong> league matches completed &middot; IPL ' + (appData.season || appData.currentSeason);
     if (appData.lastUpdated) {
       var updated = new Date(appData.lastUpdated);
-      metaHtml += '<br>Last updated: ' + updated.toLocaleString();
+      metaHtml += '<br>Last updated: ' + updated.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short', timeZoneName: 'short' });
     }
     meta.innerHTML = metaHtml;
 
