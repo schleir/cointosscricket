@@ -148,35 +148,36 @@
 
   // ===== HOME STANDINGS =====
   function renderCurrentStandings() {
-    var matches = appData.matches;
-    var completed = matches.filter(function (m) { return m.completed; });
-    var total = matches.length;
+    try {
+      var matches = appData.matches;
+      var completed = matches.filter(function (m) { return m.completed; });
+      var total = matches.length;
 
-    // Build standings from completed matches
-    var stats = {};
-    appData.teams.forEach(function (t) {
-      stats[t.id] = { points: 0, won: 0, lost: 0, noResult: 0,
-        runsScored: 0, oversPlayed: 0, runsConceded: 0, oversBowled: 0 };
-    });
+      // Build standings from completed matches
+      var stats = {};
+      appData.teams.forEach(function (t) {
+        stats[t.id] = { points: 0, won: 0, lost: 0, noResult: 0,
+          runsScored: 0, oversPlayed: 0, runsConceded: 0, oversBowled: 0 };
+      });
 
-    completed.forEach(function (m) {
-      if (m.result === 'no_result') {
-        stats[m.home].points += 1; stats[m.away].points += 1;
-        stats[m.home].noResult++; stats[m.away].noResult++;
-      } else if (m.result === 'win' && m.winner) {
-        var loser = m.winner === m.home ? m.away : m.home;
-        stats[m.winner].points += 2; stats[m.winner].won++;
-        stats[loser].lost++;
-        if (m.homeRuns != null) {
-          var hOv = m.homeAllOut ? 20 : oversToDecimal(m.homeOvers);
-          var aOv = m.awayAllOut ? 20 : oversToDecimal(m.awayOvers);
-          stats[m.home].runsScored += m.homeRuns; stats[m.home].oversPlayed += hOv;
-          stats[m.home].runsConceded += m.awayRuns; stats[m.home].oversBowled += aOv;
-          stats[m.away].runsScored += m.awayRuns; stats[m.away].oversPlayed += aOv;
-          stats[m.away].runsConceded += m.homeRuns; stats[m.away].oversBowled += hOv;
+      completed.forEach(function (m) {
+        if (m.result === 'no_result') {
+          stats[m.home].points += 1; stats[m.away].points += 1;
+          stats[m.home].noResult++; stats[m.away].noResult++;
+        } else if (m.result === 'win' && m.winner) {
+          var loser = m.winner === m.home ? m.away : m.home;
+          stats[m.winner].points += 2; stats[m.winner].won++;
+          stats[loser].lost++;
+          if (m.homeRuns != null) {
+            var hOv = m.homeAllOut ? 20 : oversToDecimal(m.homeOvers);
+            var aOv = m.awayAllOut ? 20 : oversToDecimal(m.awayOvers);
+            stats[m.home].runsScored += m.homeRuns; stats[m.home].oversPlayed += hOv;
+            stats[m.home].runsConceded += m.awayRuns; stats[m.home].oversBowled += aOv;
+            stats[m.away].runsScored += m.awayRuns; stats[m.away].oversPlayed += aOv;
+            stats[m.away].runsConceded += m.homeRuns; stats[m.away].oversBowled += hOv;
+          }
         }
-      }
-    });
+      });
 
     var standings = appData.teams.map(function (t) {
       var s = stats[t.id];
@@ -202,8 +203,12 @@
     var metaHtml = '<strong>' + completed.length + '</strong> of <strong>' + total +
       '</strong> league matches completed &middot; IPL ' + (appData.season || appData.currentSeason);
     if (appData.lastUpdated) {
-      var updated = new Date(appData.lastUpdated);
-      metaHtml += '<br>Last updated: ' + updated.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short', timeZoneName: 'short' });
+      try {
+        var updated = new Date(appData.lastUpdated);
+        metaHtml += '<br>Last updated: ' + updated.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short', timeZoneName: 'short' });
+      } catch (e) {
+        metaHtml += '<br>Last updated: ' + new Date(appData.lastUpdated).toLocaleString();
+      }
     }
     meta.innerHTML = metaHtml;
 
@@ -228,6 +233,9 @@
         '<td>' + nrrStr + '</td>';
       tbody.appendChild(tr);
     });
+    } catch (e) {
+      console.error('renderCurrentStandings error:', e);
+    }
   }
 
   // ===== PAGE NAVIGATION =====
