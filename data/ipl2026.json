@@ -1,6 +1,6 @@
 {
   "season": "2026",
-  "lastUpdated": "2026-04-14T20:16:05.138Z",
+  "lastUpdated": "2026-04-15T14:38:11.672Z",
   "teams": [
     {
       "id": "csk",
@@ -570,8 +570,8 @@
     },
     {
       "num": 37,
-      "home": "gt",
-      "away": "csk",
+      "home": "csk",
+      "away": "gt",
       "result": null,
       "winner": null,
       "completed": false,
@@ -976,8 +976,8 @@
     },
     {
       "num": 66,
-      "home": "csk",
-      "away": "gt",
+      "home": "gt",
+      "away": "csk",
       "result": null,
       "winner": null,
       "completed": false,
