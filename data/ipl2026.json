@@ -1,6 +1,6 @@
 {
   "season": "2026",
-  "lastUpdated": "2026-04-20T15:46:27.150Z",
+  "lastUpdated": "2026-04-20T16:18:27.657Z",
   "teams": [
     {
       "id": "csk",
@@ -93,6 +93,34 @@
       "awayAllOut": false
     },
     {
+      "num": 3,
+      "home": "rr",
+      "away": "csk",
+      "result": "win",
+      "winner": "rr",
+      "completed": true,
+      "homeRuns": 128,
+      "homeOvers": 12.1,
+      "homeAllOut": false,
+      "awayRuns": 127,
+      "awayOvers": 20,
+      "awayAllOut": true
+    },
+    {
+      "num": 4,
+      "home": "pbks",
+      "away": "gt",
+      "result": "win",
+      "winner": "pbks",
+      "completed": true,
+      "homeRuns": 165,
+      "homeOvers": 19.1,
+      "homeAllOut": false,
+      "awayRuns": 162,
+      "awayOvers": 20,
+      "awayAllOut": false
+    },
+    {
       "num": 5,
       "home": "lsg",
       "away": "dc",
@@ -135,6 +163,20 @@
       "awayAllOut": false
     },
     {
+      "num": 8,
+      "home": "dc",
+      "away": "mi",
+      "result": "win",
+      "winner": "dc",
+      "completed": true,
+      "homeRuns": 164,
+      "homeOvers": 18.1,
+      "homeAllOut": false,
+      "awayRuns": 162,
+      "awayOvers": 20,
+      "awayAllOut": false
+    },
+    {
       "num": 9,
       "home": "gt",
       "away": "rr",
@@ -161,6 +203,20 @@
       "awayRuns": 160,
       "awayOvers": 19.5,
       "awayAllOut": false
+    },
+    {
+      "num": 11,
+      "home": "rcb",
+      "away": "csk",
+      "result": "win",
+      "winner": "rcb",
+      "completed": true,
+      "homeRuns": 250,
+      "homeOvers": 20,
+      "homeAllOut": false,
+      "awayRuns": 207,
+      "awayOvers": 19.4,
+      "awayAllOut": true
     },
     {
       "num": 12,
@@ -215,6 +271,20 @@
       "homeOvers": 20,
       "homeAllOut": false,
       "awayRuns": 182,
+      "awayOvers": 20,
+      "awayAllOut": false
+    },
+    {
+      "num": 16,
+      "home": "rr",
+      "away": "rcb",
+      "result": "win",
+      "winner": "rr",
+      "completed": true,
+      "homeRuns": 202,
+      "homeOvers": 18,
+      "homeAllOut": false,
+      "awayRuns": 201,
       "awayOvers": 20,
       "awayAllOut": false
     },
@@ -315,6 +385,20 @@
       "awayRuns": 146,
       "awayOvers": 20,
       "awayAllOut": true
+    },
+    {
+      "num": 24,
+      "home": "mi",
+      "away": "pbks",
+      "result": "win",
+      "winner": "pbks",
+      "completed": true,
+      "homeRuns": 195,
+      "homeOvers": 20,
+      "homeAllOut": false,
+      "awayRuns": 198,
+      "awayOvers": 16.3,
+      "awayAllOut": false
     },
     {
       "num": 25,
@@ -569,9 +653,65 @@
       "awayAllOut": false
     },
     {
+      "num": 43,
+      "home": "rr",
+      "away": "dc",
+      "result": null,
+      "winner": null,
+      "completed": false,
+      "homeRuns": null,
+      "homeOvers": null,
+      "homeAllOut": false,
+      "awayRuns": null,
+      "awayOvers": null,
+      "awayAllOut": false
+    },
+    {
       "num": 44,
       "home": "csk",
       "away": "mi",
+      "result": null,
+      "winner": null,
+      "completed": false,
+      "homeRuns": null,
+      "homeOvers": null,
+      "homeAllOut": false,
+      "awayRuns": null,
+      "awayOvers": null,
+      "awayAllOut": false
+    },
+    {
+      "num": 45,
+      "home": "srh",
+      "away": "kkr",
+      "result": null,
+      "winner": null,
+      "completed": false,
+      "homeRuns": null,
+      "homeOvers": null,
+      "homeAllOut": false,
+      "awayRuns": null,
+      "awayOvers": null,
+      "awayAllOut": false
+    },
+    {
+      "num": 46,
+      "home": "gt",
+      "away": "pbks",
+      "result": null,
+      "winner": null,
+      "completed": false,
+      "homeRuns": null,
+      "homeOvers": null,
+      "homeAllOut": false,
+      "awayRuns": null,
+      "awayOvers": null,
+      "awayAllOut": false
+    },
+    {
+      "num": 47,
+      "home": "mi",
+      "away": "lsg",
       "result": null,
       "winner": null,
       "completed": false,
@@ -628,6 +768,20 @@
       "num": 51,
       "home": "dc",
       "away": "kkr",
+      "result": null,
+      "winner": null,
+      "completed": false,
+      "homeRuns": null,
+      "homeOvers": null,
+      "homeAllOut": false,
+      "awayRuns": null,
+      "awayOvers": null,
+      "awayAllOut": false
+    },
+    {
+      "num": 52,
+      "home": "rr",
+      "away": "gt",
       "result": null,
       "winner": null,
       "completed": false,
@@ -709,6 +863,20 @@
       "awayAllOut": false
     },
     {
+      "num": 58,
+      "home": "pbks",
+      "away": "mi",
+      "result": null,
+      "winner": null,
+      "completed": false,
+      "homeRuns": null,
+      "homeOvers": null,
+      "homeAllOut": false,
+      "awayRuns": null,
+      "awayOvers": null,
+      "awayAllOut": false
+    },
+    {
       "num": 59,
       "home": "lsg",
       "away": "csk",
@@ -751,6 +919,20 @@
       "awayAllOut": false
     },
     {
+      "num": 62,
+      "home": "dc",
+      "away": "rr",
+      "result": null,
+      "winner": null,
+      "completed": false,
+      "homeRuns": null,
+      "homeOvers": null,
+      "homeAllOut": false,
+      "awayRuns": null,
+      "awayOvers": null,
+      "awayAllOut": false
+    },
+    {
       "num": 63,
       "home": "csk",
       "away": "srh",
@@ -768,6 +950,20 @@
       "num": 64,
       "home": "rr",
       "away": "lsg",
+      "result": null,
+      "winner": null,
+      "completed": false,
+      "homeRuns": null,
+      "homeOvers": null,
+      "homeAllOut": false,
+      "awayRuns": null,
+      "awayOvers": null,
+      "awayAllOut": false
+    },
+    {
+      "num": 65,
+      "home": "kkr",
+      "away": "mi",
       "result": null,
       "winner": null,
       "completed": false,
@@ -824,6 +1020,20 @@
       "num": 69,
       "home": "mi",
       "away": "rr",
+      "result": null,
+      "winner": null,
+      "completed": false,
+      "homeRuns": null,
+      "homeOvers": null,
+      "homeAllOut": false,
+      "awayRuns": null,
+      "awayOvers": null,
+      "awayAllOut": false
+    },
+    {
+      "num": 70,
+      "home": "kkr",
+      "away": "dc",
       "result": null,
       "winner": null,
       "completed": false,
