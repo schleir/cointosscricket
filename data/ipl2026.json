@@ -1,6 +1,6 @@
 {
   "season": "2026",
-  "lastUpdated": "2026-05-08T20:16:14.526Z",
+  "lastUpdated": "2026-05-09T15:15:15.696Z",
   "teams": [
     {
       "id": "csk",
@@ -667,20 +667,6 @@
       "awayAllOut": false
     },
     {
-      "num": 44,
-      "home": "csk",
-      "away": "mi",
-      "result": "win",
-      "winner": "csk",
-      "completed": true,
-      "homeRuns": 160,
-      "homeOvers": 18.1,
-      "homeAllOut": false,
-      "awayRuns": 159,
-      "awayOvers": 20,
-      "awayAllOut": false
-    },
-    {
       "num": 45,
       "home": "srh",
       "away": "kkr",
@@ -720,20 +706,6 @@
       "homeAllOut": false,
       "awayRuns": 228,
       "awayOvers": 20,
-      "awayAllOut": false
-    },
-    {
-      "num": 48,
-      "home": "dc",
-      "away": "csk",
-      "result": "win",
-      "winner": "csk",
-      "completed": true,
-      "homeRuns": 155,
-      "homeOvers": 20,
-      "homeAllOut": false,
-      "awayRuns": 159,
-      "awayOvers": 17.3,
       "awayAllOut": false
     },
     {
