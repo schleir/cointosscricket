@@ -1,6 +1,6 @@
 {
   "season": "2026",
-  "lastUpdated": "2026-05-16T17:08:17.898Z",
+  "lastUpdated": "2026-05-16T17:33:41.175Z",
   "teams": [
     {
       "id": "csk",
@@ -65,20 +65,6 @@
   ],
   "matches": [
     {
-      "num": 1,
-      "home": "rcb",
-      "away": "srh",
-      "result": "win",
-      "winner": "rcb",
-      "completed": true,
-      "homeRuns": 203,
-      "homeOvers": 15.4,
-      "homeAllOut": false,
-      "awayRuns": 201,
-      "awayOvers": 20,
-      "awayAllOut": false
-    },
-    {
       "num": 2,
       "home": "mi",
       "away": "kkr",
@@ -105,20 +91,6 @@
       "awayRuns": 127,
       "awayOvers": 20,
       "awayAllOut": true
-    },
-    {
-      "num": 4,
-      "home": "pbks",
-      "away": "gt",
-      "result": "win",
-      "winner": "pbks",
-      "completed": true,
-      "homeRuns": 165,
-      "homeOvers": 19.1,
-      "homeAllOut": false,
-      "awayRuns": 162,
-      "awayOvers": 20,
-      "awayAllOut": false
     },
     {
       "num": 5,
@@ -173,20 +145,6 @@
       "homeOvers": 18.1,
       "homeAllOut": false,
       "awayRuns": 162,
-      "awayOvers": 20,
-      "awayAllOut": false
-    },
-    {
-      "num": 9,
-      "home": "gt",
-      "away": "rr",
-      "result": "win",
-      "winner": "rr",
-      "completed": true,
-      "homeRuns": 204,
-      "homeOvers": 20,
-      "homeAllOut": false,
-      "awayRuns": 210,
       "awayOvers": 20,
       "awayAllOut": false
     },
@@ -247,20 +205,6 @@
       "awayAllOut": false
     },
     {
-      "num": 14,
-      "home": "dc",
-      "away": "gt",
-      "result": "win",
-      "winner": "gt",
-      "completed": true,
-      "homeRuns": 209,
-      "homeOvers": 20,
-      "homeAllOut": false,
-      "awayRuns": 210,
-      "awayOvers": 20,
-      "awayAllOut": false
-    },
-    {
       "num": 15,
       "home": "kkr",
       "away": "lsg",
@@ -301,20 +245,6 @@
       "awayRuns": 219,
       "awayOvers": 20,
       "awayAllOut": false
-    },
-    {
-      "num": 18,
-      "home": "csk",
-      "away": "dc",
-      "result": "win",
-      "winner": "csk",
-      "completed": true,
-      "homeRuns": 212,
-      "homeOvers": 20,
-      "homeAllOut": false,
-      "awayRuns": 189,
-      "awayOvers": 20,
-      "awayAllOut": true
     },
     {
       "num": 19,
@@ -499,20 +429,6 @@
       "awayAllOut": false
     },
     {
-      "num": 32,
-      "home": "lsg",
-      "away": "rr",
-      "result": "win",
-      "winner": "rr",
-      "completed": true,
-      "homeRuns": 119,
-      "homeOvers": 18,
-      "homeAllOut": true,
-      "awayRuns": 159,
-      "awayOvers": 20,
-      "awayAllOut": false
-    },
-    {
       "num": 33,
       "home": "mi",
       "away": "csk",
@@ -580,20 +496,6 @@
       "homeAllOut": false,
       "awayRuns": 162,
       "awayOvers": 16.4,
-      "awayAllOut": false
-    },
-    {
-      "num": 38,
-      "home": "lsg",
-      "away": "kkr",
-      "result": "win",
-      "winner": null,
-      "completed": true,
-      "homeRuns": 155,
-      "homeOvers": 20,
-      "homeAllOut": false,
-      "awayRuns": 155,
-      "awayOvers": 20,
       "awayAllOut": false
     },
     {
@@ -789,20 +691,6 @@
       "homeOvers": 16.3,
       "homeAllOut": true,
       "awayRuns": 229,
-      "awayOvers": 20,
-      "awayAllOut": false
-    },
-    {
-      "num": 53,
-      "home": "csk",
-      "away": "lsg",
-      "result": "win",
-      "winner": "csk",
-      "completed": true,
-      "homeRuns": 208,
-      "homeOvers": 19.2,
-      "homeAllOut": false,
-      "awayRuns": 203,
       "awayOvers": 20,
       "awayAllOut": false
     },
