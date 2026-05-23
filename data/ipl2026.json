@@ -1,6 +1,6 @@
 {
   "season": "2026",
-  "lastUpdated": "2026-05-23T17:48:50.559Z",
+  "lastUpdated": "2026-05-23T18:12:56.831Z",
   "teams": [
     {
       "id": "csk",
@@ -1006,14 +1006,14 @@
       "num": 68,
       "home": "lsg",
       "away": "pbks",
-      "result": null,
-      "winner": null,
-      "completed": false,
-      "homeRuns": null,
-      "homeOvers": null,
+      "result": "win",
+      "winner": "pbks",
+      "completed": true,
+      "homeRuns": 196,
+      "homeOvers": 20,
       "homeAllOut": false,
-      "awayRuns": null,
-      "awayOvers": null,
+      "awayRuns": 200,
+      "awayOvers": 18,
       "awayAllOut": false
     },
     {
