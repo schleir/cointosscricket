@@ -1,6 +1,6 @@
 {
   "season": "2026",
-  "lastUpdated": "2026-05-30T20:07:53.847Z",
+  "lastUpdated": "2026-05-31T14:36:14.949Z",
   "teams": [
     {
       "id": "csk",
@@ -1088,8 +1088,8 @@
     },
     {
       "num": 74,
-      "home": "gt",
-      "away": "rcb",
+      "home": "rcb",
+      "away": "gt",
       "result": null,
       "winner": null,
       "completed": false,
